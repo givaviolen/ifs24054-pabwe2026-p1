@@ -5,17 +5,22 @@ const props = defineProps({ current: String, user: Object });
 defineEmits(["logout"]);
 
 const links = [
-  { name: "home", href: "#/beranda", label: "Beranda" },
-  { name: "list", href: "#/daftar", label: "Daftar" },
-  { name: "map", href: "#/peta", label: "Peta" },
+  { name: "home", href: "/beranda", label: "Beranda" },
+  { name: "list", href: "/daftar", label: "Daftar" },
+  { name: "map", href: "/peta", label: "Peta" },
 ];
-// Halaman detail pantai dianggap bagian dari "Daftar".
-const active = computed(() => (props.current === "detail" ? "list" : props.current));
+// Detail pantai = bagian "Daftar"; semua halaman petugas/login = "admin".
+const active = computed(() => {
+  const c = props.current || "";
+  if (c === "detail") return "list";
+  if (c.startsWith("admin") || c === "login" || c === "register") return "admin";
+  return c;
+});
 </script>
 
 <template>
   <header class="nav">
-    <a class="brand" href="#/beranda">🌊 TobaWaterSafe</a>
+    <a class="brand" href="/beranda">🌊 TobaWaterSafe</a>
 
     <nav class="links" aria-label="Menu utama">
       <a v-for="l in links" :key="l.name" :href="l.href" class="item" :class="{ on: active === l.name }">
@@ -28,7 +33,7 @@ const active = computed(() => (props.current === "detail" ? "list" : props.curre
         <span class="who">{{ user.nama }}</span>
         <button class="ghost out" @click="$emit('logout')">Keluar</button>
       </template>
-      <a href="#/petugas" class="pill" :class="{ on: active === 'admin' }">
+      <a :href="user ? '/petugas' : '/auth/login'" class="pill" :class="{ on: active === 'admin' }">
         {{ user ? "Panel Petugas" : "Login Petugas" }}
       </a>
     </div>
