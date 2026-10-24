@@ -1,0 +1,18 @@
+:root {
+  --bg: #f4f8fb; --card: #fff; --text: #17313e; --muted: #5b7380; --line: #d9e4ea;
+  --primary: #0b6e8f; --aman: #1f9d55; --waspada: #d99a00; --bahaya: #d33a3a;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px; }
+h1, h2, h3 { margin: 0 0 8px; }
+button { cursor: pointer; border: 0; border-radius: 8px; padding: 8px 14px; background: var(--primary); color: #fff; font: inherit; }
+button.ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+button.danger { background: var(--bahaya); }
+input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; width: 100%; background: #fff; }
+label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.muted { color: var(--muted); font-size: .9rem; }
+.error { color: var(--bahaya); }
