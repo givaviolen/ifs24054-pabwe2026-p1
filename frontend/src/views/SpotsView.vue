@@ -41,5 +41,5 @@ const openDetail = (id) => go(`/pantai/${id}`);
 
 <style scoped>
 .count { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
-.reset { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 3px 10px; font-size: .85rem; }
+.reset { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 4px 14px; font-size: .8rem; }
 </style>

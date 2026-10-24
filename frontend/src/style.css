@@ -1,28 +1,67 @@
 :root {
-  --bg: #f4f8fb; --card: #fff; --text: #17313e; --muted: #5b7380; --line: #d9e4ea;
-  --primary: #0b6e8f; --aman: #1f9d55; --waspada: #d99a00; --bahaya: #d33a3a;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Gradasi tema Danau Toba: biru malam -> biru danau -> hijau tosca */
+  --bg-0: #031a26;
+  --bg-1: #052a3d;
+  --bg-2: #0b5a6e;
+  --bg-3: #137a73;
+  --accent: #5ce1c8;   /* aksen tosca terang */
+  --amber: #ffb547;    /* aksen hangat untuk tombol utama */
+  --primary: #0b7a96;
+  --text: #e8f4f8;
+  --muted: rgba(232, 244, 248, .72);
+  --line: rgba(255, 255, 255, .16);
+  --ghost: var(--accent);
+  --aman: #1f9d55;
+  --waspada: #f2b705;
+  --bahaya: #d33a3a;
+  font-family: "Montserrat", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); }
-main { max-width: 1040px; margin: 0 auto; padding: 24px 16px; }
-h1, h2, h3 { margin: 0 0 8px; }
-button { cursor: pointer; border: 0; border-radius: 8px; padding: 8px 14px; background: var(--primary); color: #fff; font: inherit; }
-button.ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
-button.danger { background: var(--bahaya); }
-input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; width: 100%; background: #fff; }
-label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--muted); }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-.muted { color: var(--muted); font-size: .9rem; }
-.error { color: var(--bahaya); }
-.seg { display: inline-flex; border: 1px solid var(--primary); border-radius: 10px; overflow: hidden; margin: 4px 0 16px; }
-.seg button { border-radius: 0; background: #fff; color: var(--primary); }
-.seg button.on { background: var(--primary); color: #fff; }
 
-/* ---- tipografi & aksesibilitas (Beranda) ---- */
-:root { --ink: #0c2a3b; --lake: #2a7f9e; --mist: #eaf2f5; }
-body { font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55; }
-h1, h2, h3 { font-family: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; color: var(--ink); letter-spacing: -0.01em; }
-:focus-visible { outline: 3px solid #1b8bb0; outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background-color: var(--bg-0);
+  background-image:
+    radial-gradient(900px 600px at 100% 0%, rgba(19, 122, 115, .45), transparent 65%),
+    radial-gradient(800px 700px at 0% 45%, rgba(11, 90, 110, .40), transparent 65%),
+    radial-gradient(900px 600px at 100% 100%, rgba(19, 122, 115, .40), transparent 65%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1) 50%, var(--bg-0));
+  background-repeat: no-repeat;
+}
+
+a { color: var(--accent); }
+h1, h2, h3, h4 { margin: 0 0 8px; line-height: 1.2; }
+h1 { font-size: 2rem; }
+
+main { max-width: 1040px; margin: 0 auto; padding: 108px 16px 56px; min-height: 70vh; }
+
+button {
+  cursor: pointer; border: 0; border-radius: 999px; padding: 9px 18px;
+  background: var(--primary); color: #fff; font: inherit; font-size: .9rem;
+}
+button:hover:not(:disabled) { filter: brightness(1.12); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.ghost { background: transparent; color: var(--ghost); border: 1px solid var(--ghost); }
+button.danger { background: var(--bahaya); }
+
+input, select, textarea {
+  font: inherit; padding: 9px 12px; border: 1px solid #c9d9e0; border-radius: 10px;
+  width: 100%; background: #fff; color: #17313e;
+}
+label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--muted); }
+
+/* Kartu putih (seperti referensi): di dalamnya warna teks kembali gelap. */
+.card {
+  --text: #17313e; --muted: #5b7380; --line: #d9e4ea; --ghost: #0b6e8f;
+  background: #fff; color: var(--text); border: 1px solid var(--line);
+  border-radius: 16px; padding: 18px;
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+.muted { color: var(--muted); font-size: .9rem; }
+.error { color: #ff9a9a; }
+.card .error { color: var(--bahaya); }
