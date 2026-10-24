@@ -1,11 +1,23 @@
 import express from "express";
 import cors from "cors";
+import {
+  AuthError, registerUser, verifyLogin, createSession, getUserByToken, deleteSession,
+} from "./auth.js";
 
 const VALID_STATUS = ["AMAN", "WASPADA", "BAHAYA"];
 const ECENG = ["Bersih", "Sedang", "Pekat"];
 const OMBAK = ["Tenang", "Sedang", "Tinggi"];
 
 const toFlag = (v) => (v === 1 || v === "1" || v === true || v === "true" ? 1 : 0);
+
+// Membaca koordinat opsional. skip=true bila field tidak dikirim sama sekali.
+function parseCoord(v, min, max, name) {
+  if (v === undefined) return { skip: true };
+  if (v === null || v === "") return { value: null };
+  const n = Number(v);
+  if (Number.isNaN(n) || n < min || n > max) return { error: `${name} tidak valid` };
+  return { value: n };
+}
 
 // Status otomatis dari log harian: dipakai bila petugas tidak mengisi status manual.
 export function deriveStatus(eceng, ombak) {
@@ -32,10 +44,58 @@ const SELECT_SPOT = `
   FROM beach_spots s ${LATEST_JOIN}`;
 
 // Factory: menerima instance db agar mudah diuji (db in-memory saat testing).
-export function createApp(db) {
+export function createApp(db, options = {}) {
+  const petugasCode = options.petugasCode ?? process.env.PETUGAS_CODE ?? "TOBA2026";
   const app = express();
   app.use(cors());
   app.use(express.json());
+
+  const bearer = (req) => {
+    const h = req.headers.authorization || "";
+    return h.startsWith("Bearer ") ? h.slice(7) : null;
+  };
+
+  // Middleware: hanya petugas yang sudah login.
+  const requireAuth = (req, res, next) => {
+    const user = getUserByToken(db, bearer(req));
+    if (!user) return res.status(401).json({ error: "Silakan login sebagai petugas" });
+    req.user = user;
+    next();
+  };
+
+  const authError = (res, e) => {
+    if (e instanceof AuthError) return res.status(e.status).json({ error: e.message });
+    console.error(e);
+    return res.status(500).json({ error: "Terjadi kesalahan pada server" });
+  };
+
+  // ---------- AUTH (khusus petugas) ----------
+  app.post("/api/auth/register", async (req, res) => {
+    const b = req.body || {};
+    if (!b.kode_petugas || b.kode_petugas !== petugasCode) {
+      return res.status(403).json({ error: "Kode registrasi petugas salah" });
+    }
+    try {
+      const user = await registerUser(db, b);
+      res.status(201).json({ user, token: createSession(db, user.id) });
+    } catch (e) { authError(res, e); }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    const b = req.body || {};
+    try {
+      const user = await verifyLogin(db, b.username, b.password);
+      if (!user) return res.status(401).json({ error: "Username atau password salah" });
+      res.json({ user, token: createSession(db, user.id) });
+    } catch (e) { authError(res, e); }
+  });
+
+  app.get("/api/auth/me", requireAuth, (req, res) => res.json({ user: req.user }));
+
+  app.post("/api/auth/logout", (req, res) => {
+    deleteSession(db, bearer(req));
+    res.json({ message: "Berhasil keluar" });
+  });
 
   app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
@@ -98,7 +158,7 @@ export function createApp(db) {
   });
 
   // POST /api/spots
-  app.post("/api/spots", (req, res) => {
+  app.post("/api/spots", requireAuth, (req, res) => {
     const b = req.body || {};
     if (!b.nama_pantai || !b.kabupaten) {
       return res.status(400).json({ error: "nama_pantai dan kabupaten wajib diisi" });
@@ -111,20 +171,24 @@ export function createApp(db) {
     if (depth !== null && Number.isNaN(depth)) {
       return res.status(400).json({ error: "kedalaman_avg harus berupa angka" });
     }
+    const lat = parseCoord(b.latitude, -90, 90, "latitude");
+    const lng = parseCoord(b.longitude, -180, 180, "longitude");
+    if (lat.error || lng.error) return res.status(400).json({ error: lat.error || lng.error });
     const info = db
       .query(
         `INSERT INTO beach_spots
-           (nama_pantai, kabupaten, kedalaman_avg, is_ramah_anak, ada_pelampung, current_status)
-         VALUES (?, ?, ?, ?, ?, ?)`
+           (nama_pantai, kabupaten, kedalaman_avg, is_ramah_anak, ada_pelampung, current_status, latitude, longitude)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .run(String(b.nama_pantai).trim(), String(b.kabupaten).trim(), depth,
-           toFlag(b.is_ramah_anak), toFlag(b.ada_pelampung), status);
+           toFlag(b.is_ramah_anak), toFlag(b.ada_pelampung), status,
+           lat.value ?? null, lng.value ?? null);
     const created = db.query(`${SELECT_SPOT} WHERE s.id = ?`).get(info.lastInsertRowid);
     res.status(201).json({ data: created });
   });
 
   // PUT /api/spots/:id  (parsial: hanya field yang dikirim yang diubah)
-  app.put("/api/spots/:id", (req, res) => {
+  app.put("/api/spots/:id", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return res.status(400).json({ error: "ID tidak valid" });
     const existing = db.query("SELECT * FROM beach_spots WHERE id = ?").get(id);
@@ -147,20 +211,27 @@ export function createApp(db) {
       return res.status(400).json({ error: "kedalaman_avg harus berupa angka" });
     }
 
+    const lat = parseCoord(b.latitude, -90, 90, "latitude");
+    const lng = parseCoord(b.longitude, -180, 180, "longitude");
+    if (lat.error || lng.error) return res.status(400).json({ error: lat.error || lng.error });
+
     db.query(
       `UPDATE beach_spots SET nama_pantai=?, kabupaten=?, kedalaman_avg=?,
-         is_ramah_anak=?, ada_pelampung=?, current_status=? WHERE id=?`
+         is_ramah_anak=?, ada_pelampung=?, current_status=?, latitude=?, longitude=? WHERE id=?`
     ).run(
       nama, kab, depth,
       b.is_ramah_anak !== undefined ? toFlag(b.is_ramah_anak) : existing.is_ramah_anak,
       b.ada_pelampung !== undefined ? toFlag(b.ada_pelampung) : existing.ada_pelampung,
-      status, id
+      status,
+      lat.skip ? existing.latitude : lat.value,
+      lng.skip ? existing.longitude : lng.value,
+      id
     );
     res.json({ data: db.query(`${SELECT_SPOT} WHERE s.id = ?`).get(id) });
   });
 
   // DELETE /api/spots/:id
-  app.delete("/api/spots/:id", (req, res) => {
+  app.delete("/api/spots/:id", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id)) return res.status(400).json({ error: "ID tidak valid" });
     const info = db.query("DELETE FROM beach_spots WHERE id = ?").run(id);
@@ -169,7 +240,7 @@ export function createApp(db) {
   });
 
   // POST /api/conditions  -> log harian; status pantai ikut diperbarui
-  app.post("/api/conditions", (req, res) => {
+  app.post("/api/conditions", requireAuth, (req, res) => {
     const b = req.body || {};
     const spotId = Number(b.spot_id);
     if (!Number.isInteger(spotId)) return res.status(400).json({ error: "spot_id wajib diisi" });

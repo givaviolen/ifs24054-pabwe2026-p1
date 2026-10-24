@@ -16,3 +16,13 @@ label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--mute
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
 .muted { color: var(--muted); font-size: .9rem; }
 .error { color: var(--bahaya); }
+.seg { display: inline-flex; border: 1px solid var(--primary); border-radius: 10px; overflow: hidden; margin: 4px 0 16px; }
+.seg button { border-radius: 0; background: #fff; color: var(--primary); }
+.seg button.on { background: var(--primary); color: #fff; }
+
+/* ---- tipografi & aksesibilitas (Beranda) ---- */
+:root { --ink: #0c2a3b; --lake: #2a7f9e; --mist: #eaf2f5; }
+body { font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55; }
+h1, h2, h3 { font-family: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; color: var(--ink); letter-spacing: -0.01em; }
+:focus-visible { outline: 3px solid #1b8bb0; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
