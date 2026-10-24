@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import LakeScene from "../components/LakeScene.vue";
-import { allSpots, error, filters, resetFilters } from "../composables/useSpots";
+import { allSpots, apiError, loading, filters, resetFilters } from "../composables/useSpots";
 import { go } from "../composables/useRoute";
 
 const showcaseEl = ref(null);
@@ -76,7 +76,6 @@ const photo = (name) => ({ backgroundImage: `url(/images/${name})` });
           <button type="button" class="pill outline" @click="scrollDown">MULAI JELAJAH ⌄</button>
           <a href="#/peta" class="pill amber">LIHAT PETA</a>
         </div>
-        <p v-if="error" class="warn">{{ error }}</p>
       </div>
     </section>
 
@@ -113,8 +112,8 @@ const photo = (name) => ({ backgroundImage: `url(/images/${name})` });
             <a :href="`#/pantai/${s.id}`" class="pill teal">LIHAT DETAIL</a>
           </article>
           <article v-if="!showcase.length" class="wcard">
-            <h3>Data belum tersedia</h3>
-            <p class="meta">Pastikan Back-End berjalan, lalu muat ulang halaman.</p>
+            <h3>{{ loading ? "Memuat data…" : "Data belum tersedia" }}</h3>
+            <p class="meta">{{ apiError ? "Data pantai belum dapat dimuat. Gunakan tombol “Coba lagi” di bagian bawah layar." : "Data pantai sedang dimuat." }}</p>
           </article>
         </div>
       </div>
@@ -192,7 +191,6 @@ const photo = (name) => ({ backgroundImage: `url(/images/${name})` });
 .hero h1 { font-size: clamp(1.9rem, 4.6vw, 3.1rem); font-weight: 800; line-height: 1.22; margin-bottom: 14px; }
 .lead { font-size: 1.05rem; opacity: .92; margin: 0 0 30px; }
 .cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
-.warn { margin-top: 24px; display: inline-block; background: rgba(211, 58, 58, .85); padding: 8px 14px; border-radius: 10px; }
 
 /* ---------- sorotan ---------- */
 .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 8px; }

@@ -7,9 +7,8 @@ pipeline {
   }
 
   environment {
-    // Pastikan Bun ada di PATH agent Jenkins (lihat catatan di README)
+    // Pastikan Bun ada di PATH agent Jenkins (lihat README)
     PATH = "${env.HOME}/.bun/bin:${env.PATH}"
-    DB_PATH = ':memory:' // SQLite in-memory saat testing: tanpa server DB eksternal
   }
 
   stages {
@@ -21,33 +20,21 @@ pipeline {
       steps { sh 'bun --version' }
     }
 
-    stage('Back-End: Install & Test') {
-      steps {
-        dir('backend') {
-          sh 'bun install'
-          sh 'bun test'
-        }
-      }
+    stage('Install Dependencies') {
+      steps { sh 'bun install' }
     }
 
-    stage('Front-End: Install & Build') {
-      steps {
-        dir('frontend') {
-          sh 'bun install'
-          sh 'bun run build'
-        }
-      }
+    stage('Build') {
+      steps { sh 'bun run build' }
     }
 
     stage('Arsip Artefak') {
-      steps {
-        archiveArtifacts artifacts: 'frontend/dist/**', fingerprint: true
-      }
+      steps { archiveArtifacts artifacts: 'dist/**', fingerprint: true }
     }
   }
 
   post {
-    success { echo 'Pipeline sukses: test lulus dan build front-end selesai.' }
+    success { echo 'Pipeline sukses: build Front-End selesai.' }
     failure { echo 'Pipeline gagal: periksa Console Output.' }
   }
 }

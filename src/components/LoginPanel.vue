@@ -1,19 +1,22 @@
 <script setup>
 import { reactive, ref } from "vue";
 import { login, register } from "../composables/useAuth";
+import { describeError } from "../services/api";
 
 const mode = ref("login"); // login | register
 const form = reactive({ username: "", nama: "", password: "", kode_petugas: "" });
 const error = ref("");
+const hint = ref("");
 const loading = ref(false);
 
 async function submit() {
-  error.value = ""; loading.value = true;
+  error.value = ""; hint.value = ""; loading.value = true;
   try {
     if (mode.value === "login") await login(form.username, form.password);
     else await register({ ...form });
   } catch (e) {
-    error.value = e.response?.data?.error || "Tidak dapat terhubung ke server.";
+    const d = describeError(e, "Gagal memproses permintaan.");
+    error.value = d.message; hint.value = d.hint;
   } finally { loading.value = false; }
 }
 </script>
@@ -43,7 +46,7 @@ async function submit() {
         <input v-model="form.kode_petugas" type="password" autocomplete="off" required />
         <small class="muted">Kode diberikan oleh pengelola. Tanpa kode, akun tidak dapat dibuat.</small>
       </label>
-      <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="error" class="error" role="alert">{{ error }}<small v-if="hint" class="muted"><br />{{ hint }}</small></p>
       <button type="submit" :disabled="loading">
         {{ loading ? "Memproses…" : mode === "login" ? "Masuk" : "Daftar" }}
       </button>

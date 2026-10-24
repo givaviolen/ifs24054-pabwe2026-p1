@@ -1,109 +1,57 @@
-# TobaWaterSafe
+# TobaWaterSafe — Front-End (`ifs24054-pabwe2026-p1`)
 
-Sistem Pemantauan Status Kelayakan Zona Berenang dan Kondisi Pesisir Danau Toba Berbasis Web.
+Antarmuka web **Vue 3 + Vite** (axios) untuk memantau status kelayakan zona berenang dan kondisi pesisir
+Danau Toba. Package manager & runtime: **Bun**. CI: **Jenkins**. Deploy: **Vercel**.
 
-Stack: **Express.js + SQLite (`bun:sqlite`)** · **Vue 3 + Vite** · **Google Maps JavaScript API** · runtime & package manager **Bun** · CI **Jenkins**.
+Back-End (Express + SQLite) ada di repo terpisah: `ifs24054-pabwe2026-proyek1-be`.
 
-- **Wisatawan** (tanpa akun): beranda informasi, daftar pantai dengan filter, peta berwarna, dan detail kondisi.
-  Halaman: `#/beranda`, `#/daftar`, `#/peta`, `#/pantai/:id`, `#/petugas`.
-- **Petugas** (wajib login): kelola data pantai dan catat kondisi harian.
+- **Wisatawan** (tanpa akun): beranda, daftar pantai (cari, filter kabupaten/status/pelampung/ramah anak, urutkan), peta berwarna, detail kondisi terkini + riwayat.
+- **Petugas** (login): tambah/ubah/hapus pantai (CRUD) dan catat kondisi harian.
+- Rute: `#/beranda`, `#/daftar`, `#/peta`, `#/pantai/:id`, `#/petugas`.
 
 ## Struktur
 
 ```
-tobawatersafe/
-├── Jenkinsfile
-├── docs/Dokumen_Proyek_1.md
-├── backend/
-│   ├── .env.example                  # PETUGAS_CODE, PORT
-│   ├── src/  db.js  auth.js  app.js  server.js
-│   └── tests/ db.test.js  auth.test.js  spots.test.js  crud.test.js
-└── frontend/
-    ├── .env.example                  # VITE_API_URL, VITE_GOOGLE_MAPS_API_KEY
-    └── src/
-        ├── App.vue                       # kerangka + routing
-        ├── views/ HomeView  SpotsView  AdminView
-        ├── composables/ useAuth  useRoute  useSpots
-        ├── utils/route.js
-        ├── services/ api.js  googleMaps.js
-        └── components/ Navbar  Footer  SpotCard  FilterBar  SpotDetail
-                        MapView  LoginPanel  SpotForm  AdminLogModal  StatusBadge
-    └── public/images/                # hero.jpg, galeri-1..4.jpg (opsional)
+src/
+├── App.vue                  # kerangka + routing
+├── views/                   # HomeView  SpotsView  AdminView
+├── components/              # Navbar Footer SpotCard FilterBar SpotDetail AdminLogModal
+│                            # SpotForm LoginPanel MapView StatusBadge ApiAlert ...
+├── composables/             # useSpots  useAuth  useRoute
+├── services/                # api.js (axios)  googleMaps.js
+└── utils/                   # format.js  route.js  mapShared.js
 ```
 
-## Menjalankan di komputer lokal
+## Menjalankan lokal
 
-Prasyarat: [Bun](https://bun.sh), Git.
+Prasyarat: [Bun](https://bun.sh). Jalankan Back-End lebih dulu (lihat README repo `-be`).
 
 ```bash
-git clone <URL-REPO-ANDA>
-cd tobawatersafe
-
-# Terminal 1 - API di http://localhost:3000
-cd backend
-cp .env.example .env        # Windows PowerShell: copy .env.example .env
 bun install
-bun run dev
-
-# Terminal 2 - Front-End di http://localhost:5173
-cd frontend
-cp .env.example .env        # Windows PowerShell: copy .env.example .env
-bun install
-bun run dev
+cp .env.example .env      # Windows PowerShell: copy .env.example .env
+bun run dev               # http://localhost:5173
+bun run build             # hasil di dist/
 ```
 
-Database `backend/tobawatersafe.sqlite` dibuat otomatis berisi 17 pantai contoh. Database lama otomatis
-dimigrasi (kolom koordinat ditambahkan) tanpa menghapus data.
+## Menghubungkan ke Back-End
 
-## Akun petugas
+Isi `VITE_API_URL` (akhiran `/api` boleh ditulis atau tidak):
 
-1. Buka aplikasi, klik **Login Petugas**, pilih tab **Registrasi**.
-2. Isi username, nama, password, dan **kode registrasi petugas** (nilai `PETUGAS_CODE` di `backend/.env`, bawaan `TOBA2026`).
-3. Setelah itu login seperti biasa. Wisatawan tidak memiliki fitur login maupun registrasi.
+| Lingkungan | Nilai |
+|---|---|
+| Lokal | `http://localhost:3000/api` |
+| Produksi (Vercel) | `https://<project-backend>.vercel.app/api` |
 
-> Ganti `PETUGAS_CODE` sebelum deployment. Siapa pun yang tahu kode ini dapat membuat akun petugas.
+Di Vercel: **Project Front-End → Settings → Environment Variables → `VITE_API_URL`**, lalu **Redeploy**
+(variabel `VITE_*` ditanam saat build, jadi wajib build ulang setelah mengubahnya).
 
-## Peta Google Maps
+Jika API tidak terjangkau, aplikasi menampilkan pesan beserta petunjuk penyebabnya dan tombol **Coba lagi**.
 
-Peta memakai Google Maps JavaScript API dan membutuhkan API key:
+## Peta
 
-1. Buka [Google Cloud Console](https://console.cloud.google.com/), buat/pilih project.
-2. Aktifkan **Maps JavaScript API** (menu *APIs & Services → Library*).
-3. Pasang akun penagihan (*billing*). Google memberi kuota gratis bulanan, tetapi akun penagihan tetap diwajibkan.
-4. *APIs & Services → Credentials → Create credentials → API key*.
-5. Batasi key (*Application restrictions → Websites*): `http://localhost:5173/*` dan alamat situs deployment Anda.
-6. Isi `frontend/.env`: `VITE_GOOGLE_MAPS_API_KEY=KEY_ANDA`, lalu jalankan ulang `bun run dev`.
-
-Warna penanda: 🟢 Aman · 🟡 Waspada · 🔴 Bahaya. Lingkaran di sekitar titik menandai kawasan pantai.
-Tanpa API key, seluruh aplikasi tetap berjalan; hanya tab Peta yang menampilkan petunjuk.
-
-Koordinat pantai pada data contoh adalah **perkiraan**. Periksa di Google Maps dan perbaiki lewat Panel Petugas → Ubah.
-
-## Pengujian & build
-
-```bash
-cd backend  && bun test
-cd frontend && bun run build   # hasil di frontend/dist
-```
-
-## Endpoint API
-
-| Method | Endpoint | Akses | Keterangan |
-|---|---|---|---|
-| GET | `/api/spots` | publik | Daftar pantai + koordinat + kondisi terbaru. Filter: `status`, `kabupaten`, `ada_pelampung`, `ramah_anak` |
-| GET | `/api/spots/:id` | publik | Detail + riwayat log |
-| POST | `/api/spots` | petugas | Tambah pantai (termasuk `latitude`, `longitude`) |
-| PUT | `/api/spots/:id` | petugas | Ubah pantai (parsial) |
-| DELETE | `/api/spots/:id` | petugas | Hapus pantai (log ikut terhapus) |
-| POST | `/api/conditions` | petugas | Tambah log harian; status pantai diperbarui otomatis (atau manual lewat `current_status`) |
-| POST | `/api/auth/register` | kode petugas | Buat akun petugas, mengembalikan token |
-| POST | `/api/auth/login` | publik | Login, mengembalikan token |
-| GET | `/api/auth/me` | petugas | Data akun yang sedang login |
-| POST | `/api/auth/logout` | petugas | Akhiri sesi |
-
-Endpoint petugas memerlukan header `Authorization: Bearer <token>`.
+Tanpa API key, peta memakai OpenStreetMap otomatis. Untuk Google Maps, isi `VITE_GOOGLE_MAPS_API_KEY`
+(Maps JavaScript API, batasi key ke domain Anda).
 
 ## Jenkins
 
-Agent harus memiliki Bun (`curl -fsSL https://bun.sh/install | bash`). Pipeline: install → `bun test` → `bun run build` → arsip `dist/`.
-Test memakai SQLite `:memory:` sehingga tidak butuh server database, dan tidak membutuhkan API key Google Maps.
+Agent harus memiliki Bun. Pipeline: install → `bun run build` → arsip `dist/`.
