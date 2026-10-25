@@ -114,10 +114,29 @@ pipeline {
                     echo "=== Trivy Version ==="
                     trivy --version
 
+                    # mirror.gcr.io (default DB repo) mengembalikan 404.
+                    # Pakai repo alternatif: GHCR dulu, lalu fallback ke AWS ECR.
+                    export TRIVY_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-db:2,public.ecr.aws/aquasecurity/trivy-db:2"
+                    export TRIVY_JAVA_DB_REPOSITORY="ghcr.io/aquasecurity/trivy-java-db:1,public.ecr.aws/aquasecurity/trivy-java-db:1"
+
+                    echo "=== Download Vulnerability DB ==="
+                    ATTEMPT=1
+                    until trivy image --download-db-only --cache-dir .trivy-cache --no-progress; do
+                        if [ "$ATTEMPT" -ge 3 ]; then
+                            echo "Gagal mengunduh Trivy DB setelah $ATTEMPT percobaan"
+                            exit 1
+                        fi
+                        ATTEMPT=$((ATTEMPT + 1))
+                        echo "Retry download DB (percobaan $ATTEMPT/3)..."
+                        sleep 5
+                    done
+
                     echo "=== Trivy Scan ==="
 
                     trivy fs \
                         --cache-dir .trivy-cache \
+                        --skip-db-update \
+                        --skip-java-db-update \
                         --scanners vuln \
                         --severity HIGH,CRITICAL \
                         --format sarif \
