@@ -43,10 +43,10 @@ async function submit() {
 
       <form @submit.prevent="submit">
         <label>Username
-          <input id="username" v-model="form.username" name="username" autocomplete="username" maxlength="30" required />
+          <input id="username" v-model="form.username" name="username" type="text" autocomplete="username" maxlength="30" required />
         </label>
         <label v-if="!isLogin">Nama lengkap
-          <input id="nama" v-model="form.nama" name="nama" autocomplete="name" maxlength="60" required />
+          <input id="nama" v-model="form.nama" name="nama" type="text" autocomplete="name" maxlength="60" required />
         </label>
         <label>Password
           <input id="password" v-model="form.password" name="password" type="password" minlength="6" maxlength="100"
@@ -102,7 +102,7 @@ label input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 
 small { display: block; margin-top: 5px; font-weight: 400; color: var(--muted); }
 
 .err { margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; font-size: .86rem;
-  background: rgba(211, 58, 58, .18); border: 1px solid rgba(211, 58, 58, .5); color: #ffc5c5; }
+  background: #4a1616; border: 1px solid #b03a3a; color: #ffe1e1; }
 
 .submit { width: 100%; padding: 12px; font-weight: 700; border-radius: 999px; background: var(--amber); color: #1b2a30; }
 

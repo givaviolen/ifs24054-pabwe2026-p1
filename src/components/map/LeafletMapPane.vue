@@ -49,7 +49,7 @@ onBeforeUnmount(() => { map?.remove(); map = null; });
 </script>
 
 <template>
-  <div ref="mapEl" class="map" role="region" aria-label="Peta status pantai Danau Toba"></div>
+  <section ref="mapEl" class="map" aria-label="Peta status pantai Danau Toba"></section>
 </template>
 
 <style scoped>

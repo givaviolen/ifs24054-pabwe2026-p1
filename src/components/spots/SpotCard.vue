@@ -12,15 +12,17 @@ const photo = ref(spotPhoto(props.spot)); // jadi null otomatis bila file foto t
 </script>
 
 <template>
-  <article class="card spot" :class="spot.current_status.toLowerCase()" tabindex="0" role="link"
-           :aria-label="`Lihat detail ${spot.nama_pantai}`"
-           @click="emit('select', spot.id)" @keydown.enter="emit('select', spot.id)">
+  <article class="card spot" :class="spot.current_status.toLowerCase()">
     <img v-if="photo" :src="photo" :alt="`Foto ${spot.nama_pantai}`" class="thumb" loading="lazy"
          @error="photo = null" />
 
     <div class="body">
       <div class="top">
-        <h3>{{ spot.nama_pantai }}</h3>
+        <h3>
+          <a class="title-link" :href="`/pantai/${spot.id}`"
+             :aria-label="`Lihat detail ${spot.nama_pantai}`"
+             @click.prevent="emit('select', spot.id)">{{ spot.nama_pantai }}</a>
+        </h3>
         <StatusBadge :status="spot.current_status" />
       </div>
       <p class="muted kab">📍 Kabupaten {{ spot.kabupaten }}</p>
@@ -52,7 +54,9 @@ const photo = ref(spotPhoto(props.spot)); // jadi null otomatis bila file foto t
 .spot::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--aman); z-index: 1; }
 .spot.waspada::before { background: var(--waspada); }
 .spot.bahaya::before { background: var(--bahaya); }
-.spot:hover, .spot:focus-visible { box-shadow: 0 10px 26px rgba(0, 0, 0, .18); transform: translateY(-2px); outline: none; }
+.title-link { color: inherit; text-decoration: none; }
+.title-link::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.spot:hover, .spot:focus-within { box-shadow: 0 10px 26px rgba(0, 0, 0, .18); transform: translateY(-2px); }
 
 .thumb { display: block; width: 100%; height: 150px; object-fit: cover; }
 .body { padding: 16px 18px 16px 24px; }

@@ -12,7 +12,12 @@ const emit = defineEmits(["select"]);
 
 const keyOk = hasMapsKey();
 const provider = ref(keyOk && !isMapsAuthFailed() ? "google" : "osm");
-const reason = ref(keyOk ? (isMapsAuthFailed() ? "AUTH_FAILED" : "") : "NO_KEY");
+
+function initialReason() {
+  if (!keyOk) return "NO_KEY";
+  return isMapsAuthFailed() ? "AUTH_FAILED" : "";
+}
+const reason = ref(initialReason());
 
 function googleFailed(why) {
   reason.value = why;

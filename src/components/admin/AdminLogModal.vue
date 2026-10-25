@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import { addCondition } from "../../services/spotApi";
 import { describeError } from "../../services/apiError";
 import { STATUS_KEYS, ECENG_LEVELS, OMBAK_LEVELS, statusMeta } from "../../constants/status";
@@ -15,6 +15,9 @@ const form = reactive({
   current_status: "",
   catatan_petugas: "",
 });
+const dialogEl = ref(null);
+onMounted(() => dialogEl.value?.showModal?.());
+
 const error = ref("");
 const saving = ref(false);
 
@@ -36,7 +39,7 @@ async function submit() {
 </script>
 
 <template>
-  <div class="overlay" role="dialog" aria-modal="true" aria-label="Laporan kondisi harian" @click.self="$emit('close')" @keydown.esc="$emit('close')">
+  <dialog ref="dialogEl" class="overlay" aria-label="Laporan kondisi harian" @click.self="$emit('close')" @cancel.prevent="$emit('close')">
     <form class="card modal" @submit.prevent="submit">
       <h3>Laporan Kondisi Harian</h3>
       <label>Pantai
@@ -70,11 +73,12 @@ async function submit() {
         <button type="submit" :disabled="saving">{{ saving ? "Menyimpan…" : "Simpan laporan" }}</button>
       </div>
     </form>
-  </div>
+  </dialog>
 </template>
 
 <style scoped>
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 16px; z-index: 1500; }
+.overlay { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; padding: 16px; color: inherit; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); z-index: 1500; }
+.overlay[open] { display: grid; place-items: center; }
 .modal { width: 100%; max-width: 460px; max-height: 90vh; overflow: auto; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .preview { margin: 0 0 12px; padding: 8px 12px; border-radius: 10px; font-size: .88rem; background: #dff3e7; color: #17653c; }
