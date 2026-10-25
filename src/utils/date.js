@@ -1,39 +1,77 @@
-// Fungsi murni untuk format waktu (mudah diuji).
-const WIB = "Asia/Jakarta";
+const WIB_TIMEZONE = "Asia/Jakarta";
 
-// SQLite CURRENT_TIMESTAMP menghasilkan "YYYY-MM-DD HH:MM:SS" dalam UTC.
-export function parseSqlDate(value) {
-  if (!value) return null;
-  const s = String(value);
-  const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? s.replace(" ", "T") : s.replace(" ", "T") + "Z");
-  return Number.isNaN(d.getTime()) ? null : d;
+/**
+ * Parsing tanggal dari string format SQL (YYYY-MM-DD HH:MM:SS) atau ISO string
+ */
+export function parseSqlDate(str) {
+  if (!str || typeof str !== "string") return null;
+
+  // Tangani format SQL "YYYY-MM-DD HH:MM:SS" sebagai UTC
+  const sqlMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+  if (sqlMatch) {
+    const [, y, m, d, h, min, s] = sqlMatch;
+    return new Date(Date.UTC(+y, +m - 1, +d, +h, +min, +s));
+  }
+
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
 }
 
-export function formatWib(value) {
-  const d = parseSqlDate(value);
-  if (!d) return "-";
-  const text = d.toLocaleString("id-ID", {
-    timeZone: WIB, day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
-  });
-  return `${text} WIB`;
+/**
+ * Menghasilkan teks waktu relatif (contoh: "5 menit lalu", "baru saja")
+ */
+export function timeAgo(dateInput) {
+  if (!dateInput) return "-";
+
+  const date = dateInput instanceof Date ? dateInput : parseSqlDate(dateInput);
+  if (!date) return "-";
+
+  const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diffSec < 60) return "baru saja";
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)} menit lalu`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)} jam lalu`;
+  return `${Math.floor(diffSec / 86400)} hari lalu`;
 }
 
-export function timeAgo(value, now = Date.now()) {
-  const d = parseSqlDate(value);
+/**
+ * Mengubah input ke tanggal kalender WIB (YYYY-MM-DD)
+ */
+function toWibDayString(input) {
+  if (!input) return "";
+  const d = input instanceof Date ? input : parseSqlDate(input);
   if (!d) return "";
-  const sec = Math.max(0, Math.round((now - d.getTime()) / 1000));
-  if (sec < 60) return "baru saja";
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} menit lalu`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} jam lalu`;
-  return `${Math.floor(hr / 24)} hari lalu`;
+  return d.toLocaleDateString("en-CA", { timeZone: WIB_TIMEZONE });
 }
 
-const wibDay = (d) => d.toLocaleDateString("en-CA", { timeZone: WIB });
+/**
+ * Memeriksa apakah dua tanggal jatuh pada hari kalender yang sama di zona WIB
+ */
+export function isSameWibDay(dateA, dateB = new Date()) {
+  const dayA = toWibDayString(dateA);
+  const dayB = toWibDayString(dateB);
+  if (!dayA || !dayB) return false;
+  return dayA === dayB;
+}
 
-// Apakah tanggal SQL itu jatuh pada hari yang sama (zona WIB) dengan `now`?
-export function isSameWibDay(value, now = new Date()) {
-  const d = parseSqlDate(value);
-  return Boolean(d) && wibDay(d) === wibDay(now);
+/**
+ * Format tanggal ke standar WIB dengan akhiran "WIB"
+ */
+export function formatWib(dateInput) {
+  if (!dateInput) return "-";
+
+  const date = dateInput instanceof Date ? dateInput : parseSqlDate(dateInput);
+  if (!date) return "-";
+
+  const options = {
+    timeZone: WIB_TIMEZONE,
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  };
+
+  const formatted = new Intl.DateTimeFormat("id-ID", options).format(date);
+  return `${formatted.replace(/\./g, ":")} WIB`;
 }

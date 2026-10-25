@@ -16,53 +16,64 @@ AUTH_PAGES.has = function (item) {
 };
 
 /**
- * Mengubah URL hash (misal #/daftar) menjadi path standar (/daftar)
- * PENTING: Jika hash kosong, kembalikan string kosong "" agar TIDAK menimpa window.location.pathname!
+ * Mengubah URL hash menjadi path:
+ * #/peta -> /peta
+ * #bagian atau "" -> null
  */
-export function hashToPath(hash = window.location.hash) {
-  if (!hash || hash === "#" || hash === "#/") return "";
-  return hash.replace(/^#/, "");
+export function hashToPath(hash = (typeof window !== "undefined" ? window.location.hash : "")) {
+  if (!hash || typeof hash !== "string") return null;
+  if (!hash.startsWith("#/")) return null;
+  return hash.slice(1);
 }
 
 /**
- * Parsing path string menjadi objek route
+ * Parsing path string menjadi objek route beserta query parameter
  */
-export function parsePath(pathname = window.location.pathname) {
-  // Ambil path murni tanpa query string dan trailing slash
-  const pathOnly = (pathname || "/").split("?")[0].split("#")[0];
+export function parsePath(pathname = (typeof window !== "undefined" ? window.location.pathname : "/")) {
+  if (!pathname) return { name: "notfound", query: {} };
+
+  const [pathOnly, queryPart] = pathname.split("?");
   const clean = pathOnly.replace(/\/+$/, "") || "/";
 
+  // Parsing query parameter
+  const query = {};
+  if (queryPart) {
+    const searchParams = new URLSearchParams(queryPart);
+    searchParams.forEach((val, key) => {
+      query[key] = val;
+    });
+  }
+
   // Halaman publik utama
-  if (clean === "/" || clean === "/beranda") return { name: "home" };
-  if (clean === "/daftar") return { name: "list" };
-  if (clean === "/peta") return { name: "map" };
+  if (clean === "/" || clean === "/beranda") return { name: "home", query };
+  if (clean === "/daftar") return { name: "list", query };
+  if (clean === "/peta") return { name: "map", query };
 
   // Detail pantai: /pantai/:id
   const spotMatch = clean.match(/^\/pantai\/(\d+)$/);
   if (spotMatch) {
-    return { name: "detail", id: Number(spotMatch[1]) };
+    return { name: "detail", id: Number(spotMatch[1]), query };
   }
 
   // Halaman autentikasi
-  if (clean === "/auth/login") return { name: "login" };
-  if (clean === "/auth/register") return { name: "register" };
+  if (clean === "/auth/login") return { name: "login", query };
+  if (clean === "/auth/register") return { name: "register", query };
 
-  // Area petugas (Authenticated)
-  if (clean === "/petugas") return { name: "admin" };
-  if (clean === "/petugas/pantai") return { name: "admin-spots" };
+  // Area petugas
+  if (clean === "/petugas") return { name: "admin", query };
+  if (clean === "/petugas/pantai") return { name: "admin-spots", query };
 
-  // Menangani rute dinamis jika crawler mengakses /petugas/pantai/:id (misal /petugas/pantai/2)
+  // Menangani rute dinamis /petugas/pantai/:id
   const adminSpotMatch = clean.match(/^\/petugas\/pantai\/(\d+)$/);
   if (adminSpotMatch) {
-    return { name: "admin-spots", editId: Number(adminSpotMatch[1]) };
+    return { name: "admin-spots", editId: Number(adminSpotMatch[1]), query };
   }
 
-  if (clean === "/petugas/pantai/tambah") return { name: "admin-spot-new" };
-  if (clean === "/petugas/kondisi") return { name: "admin-log" };
+  if (clean === "/petugas/pantai/tambah") return { name: "admin-spot-new", query };
+  if (clean === "/petugas/kondisi") return { name: "admin-log", query };
 
   // Fallback
-  return { name: "notfound" };
+  return { name: "notfound", query };
 }
 
-// Alias untuk fleksibilitas import
 export const parseRoute = parsePath;
