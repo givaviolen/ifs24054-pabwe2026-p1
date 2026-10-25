@@ -33,7 +33,11 @@ export function parsePath(pathname = (globalThis.location ? globalThis.location.
   if (!pathname) return { name: "notfound", query: {} };
 
   const [pathOnly, queryPart] = pathname.split("?");
-  const clean = pathOnly.replace(/\/+$/, "") || "/";
+  let cleanPath = pathOnly;
+  while (cleanPath.endsWith("/")) {
+    cleanPath = cleanPath.slice(0, -1);
+  }
+  const clean = cleanPath || "/";
 
   // Parsing query parameter
   const query = {};

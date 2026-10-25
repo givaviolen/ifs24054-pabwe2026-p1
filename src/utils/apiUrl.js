@@ -3,7 +3,10 @@
 export const DEFAULT_API_URL = "http://localhost:3000/api";
 
 export function normalizeApiUrl(value) {
-  const url = String(value ?? "").trim().replace(/\/+$/, "");
+  let url = String(value ?? "").trim();
+  while (url.endsWith("/")) {
+    url = url.slice(0, -1);
+  }
   if (!url) return DEFAULT_API_URL;
   return /\/api$/i.test(url) ? url : `${url}/api`;
 }
