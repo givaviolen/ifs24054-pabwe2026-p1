@@ -27,8 +27,8 @@ import { apiError, dismissApiError, loadSpots, loading } from "../../composables
 .txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .txt small { opacity: .88; line-height: 1.45; word-break: break-word; }
 .btns { display: flex; gap: 8px; flex: none; align-items: center; }
-.btns button { background: #fff; color: #8c2b2b; font-weight: 700; padding: 7px 14px; }
-.btns .x { background: transparent; color: #fff; padding: 6px 8px; }
+.btns button { background: #fff; color: #8c2b2b; font-weight: 700; padding: 7px 14px; min-width: 108px; }
+.btns .x { background: transparent; color: #fff; padding: 6px 8px; min-width: 0; }
 .slide-enter-active, .slide-leave-active { transition: opacity .2s, transform .2s; }
 .slide-enter-from, .slide-leave-to { opacity: 0; transform: translate(-50%, 12px); }
 </style>

@@ -64,9 +64,9 @@ const slide = (direction) => track.value?.scrollBy({ left: direction * SLIDE_STE
 .round { width: 38px; height: 38px; padding: 0; border-radius: 50%; background: transparent; border: 1px solid rgba(255, 255, 255, .6); color: #fff; font-size: 1.3rem; line-height: 1; }
 .body { position: relative; display: flex; align-items: center; margin-top: 8px; }
 .tall { position: relative; flex: 0 0 280px; height: 360px; border-radius: 20px; overflow: hidden; z-index: 1; box-shadow: 0 14px 40px rgba(0, 0, 0, .35); }
-.track { position: relative; z-index: 2; display: flex; gap: 20px; overflow-x: auto; margin-left: -70px; padding: 34px 8px 34px 0; scroll-snap-type: x mandatory; scrollbar-width: none; flex: 1; min-width: 0; }
+.track { position: relative; z-index: 2; display: flex; gap: 20px; overflow-x: auto; margin-left: -70px; padding: 34px 8px 34px 0; scroll-snap-type: x mandatory; scrollbar-width: none; flex: 1; min-width: 0; min-height: 460px;
 .track::-webkit-scrollbar { display: none; }
-.wcard { flex: 0 0 270px; scroll-snap-align: start; background: #fff; color: #17313e; border-radius: 16px; padding: 22px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); display: flex; flex-direction: column; min-height: 340px; }
+.wcard { flex: 0 0 270px; scroll-snap-align: start; background: #fff; color: #17313e; border-radius: 16px; padding: 22px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); display: flex; flex-direction: column; min-height: 392px; }
 .ico { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; margin-bottom: 14px; }
 .ico.aman { background: #d9f2e3; } .ico.waspada { background: #fff1c2; } .ico.bahaya { background: #fbd9d9; }
 .wcard h3 { font-size: 1.02rem; color: #0f5a4c; margin-bottom: 4px; }
