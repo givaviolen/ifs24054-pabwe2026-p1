@@ -32,10 +32,12 @@ function buildMapsUrl() {
 
 // Skrip resmi Google Maps tidak mendukung Subresource Integrity (isinya berubah
 // mengikuti versi "weekly"), sehingga atribut integrity tidak dapat dipasang.
-// Titik ini sengaja dibiarkan terdeteksi sebagai Security Hotspot agar ditinjau
-// (Review -> Safe) di SonarQube, bukan disembunyikan dengan komentar penekan.
+// Alamat dasar ditulis literal agar Sonar (S5725) mendaftarkan skrip eksternal ini
+// sebagai Security Hotspot untuk ditinjau (Review -> Safe). URL lengkap (key dan
+// callback) langsung menggantikannya pada baris berikutnya.
 function appendMapsScript(url, onError) {
   const script = document.createElement("script");
+  script.src = "https://maps.googleapis.com/maps/api/js";
   script.setAttribute("src", url);
   script.async = true;
   script.onerror = onError;
