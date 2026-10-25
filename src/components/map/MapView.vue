@@ -1,11 +1,12 @@
 <script setup>
-import { ref, computed } from "vue";
-import GoogleMapPane from "./GoogleMapPane.vue";
-import LeafletMapPane from "./LeafletMapPane.vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import { hasMapsKey, isMapsAuthFailed } from "../../services/googleMaps";
 import { COLORS } from "../../utils/mapShared";
 
-// Memilih peta: Google Maps bila API key valid, selain itu otomatis OpenStreetMap.
+// Lazy-load komponen map agar leaflet.js tidak membebani halaman lain
+const GoogleMapPane = defineAsyncComponent(() => import("./GoogleMapPane.vue"));
+const LeafletMapPane = defineAsyncComponent(() => import("./LeafletMapPane.vue"));
+
 const props = defineProps({ spots: { type: Array, default: () => [] } });
 const emit = defineEmits(["select"]);
 
@@ -24,7 +25,7 @@ const withoutCoords = computed(
 
 const notes = {
   NO_KEY: "Menampilkan peta OpenStreetMap karena API key Google Maps belum diisi di file .env.",
-  AUTH_FAILED: "Menampilkan peta OpenStreetMap karena Google Maps menolak API key (buka Console browser dengan F12 untuk melihat nama error-nya).",
+  AUTH_FAILED: "Menampilkan peta OpenStreetMap karena Google Maps menolak API key.",
   LOAD_FAILED: "Menampilkan peta OpenStreetMap karena Google Maps gagal dimuat.",
 };
 </script>

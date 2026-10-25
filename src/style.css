@@ -63,13 +63,22 @@ label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--mute
   background: #fff; color: var(--text); border: 1px solid var(--line);
   border-radius: 16px; padding: 18px;
 }
-.card a {
+
+/* Link biasa di dalam kartu */
+.card a:not(.btn) {
   color: #0c6a85; /* Rasio kontras 5.2:1 terhadap background #ffffff */
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.card a:hover {
+.card a:not(.btn):hover {
   color: #064051;
+}
+
+/* Tombol (anchor tag dengan class btn) di dalam kartu */
+.card a.btn,
+.card .btn {
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
@@ -111,10 +120,10 @@ button:active:not(:disabled) { transform: translateY(1px); }
 /* Komponen bersama */
 .btn {
   display: inline-block; padding: 9px 18px; border-radius: 999px; font-size: .88rem; font-weight: 600;
-  background: var(--primary); color: #fff; text-decoration: none !important; border: 1px solid var(--primary);
+  background: var(--primary); color: #ffffff !important; text-decoration: none !important; border: 1px solid var(--primary);
 }
 .btn:hover { filter: brightness(1.12); }
-.btn.ghost { background: transparent; color: var(--ghost); border-color: var(--ghost); }
+.btn.ghost { background: transparent; color: #08617f !important; border-color: #08617f; }
 .btn.sm { padding: 6px 12px; font-size: .82rem; }
 
 .table-wrap { overflow-x: auto; }
