@@ -32,7 +32,7 @@ const cards = computed(() => [
     </div>
 
     <div class="card">
-      <h3>Laporan terbaru</h3>
+      <h2>Laporan terbaru</h2>
       <p v-if="!recent.length" class="muted">Belum ada laporan.</p>
       <ul v-else class="recent">
         <li v-for="s in recent" :key="s.id">
@@ -57,6 +57,7 @@ const cards = computed(() => [
 
 .actions { display: flex; gap: 8px; margin: 4px 0 16px; flex-wrap: wrap; align-items: center; }
 
+h2 { font-size: 1.2rem; margin-bottom: 8px; }
 .recent { list-style: none; margin: 8px 0 0; padding: 0; }
 .recent li { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 9px 0; border-bottom: 1px solid var(--line); }
 .recent li .muted { margin-left: auto; font-size: .84rem; }

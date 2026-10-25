@@ -12,7 +12,6 @@ const error = ref("");
 const hint = ref("");
 const loading = ref(false);
 
-// Berpindah antara login dan registrasi: bersihkan pesan error dan isian rahasia.
 watch(() => props.mode, () => {
   error.value = ""; hint.value = "";
   form.password = ""; form.kode_petugas = "";
@@ -35,7 +34,7 @@ async function submit() {
   <section class="auth">
     <div class="panel">
       <div class="icon" aria-hidden="true">🌊</div>
-      <h2>{{ isLogin ? "Masuk sebagai Petugas" : "Daftar Akun Petugas" }}</h2>
+      <h1>{{ isLogin ? "Masuk sebagai Petugas" : "Daftar Akun Petugas" }}</h1>
       <p class="sub">
         {{ isLogin
           ? "Masuk untuk memperbarui kondisi pantai dan mengelola data pesisir."
@@ -91,7 +90,7 @@ async function submit() {
   width: 52px; height: 52px; display: grid; place-items: center; font-size: 1.6rem; margin-bottom: 14px;
   border-radius: 16px; background: rgba(92, 225, 200, .14); border: 1px solid rgba(92, 225, 200, .35);
 }
-h2 { font-size: 1.55rem; color: #fff; }
+h1 { font-size: 1.55rem; color: #fff; margin-bottom: 8px; }
 .sub { margin: 0 0 22px; color: var(--muted); font-size: .92rem; line-height: 1.55; }
 
 label { display: block; margin-bottom: 14px; font-size: .82rem; font-weight: 600; color: var(--text); }

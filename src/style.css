@@ -4,16 +4,18 @@
   --bg-1: #052a3d;
   --bg-2: #0b5a6e;
   --bg-3: #137a73;
-  --accent: #5ce1c8;   /* aksen tosca terang */
+  --accent: #5ce1c8;   /* aksen tosca terang untuk latar gelap */
   --amber: #ffb547;    /* aksen hangat untuk tombol utama */
   --primary: #0b7a96;
   --text: #e8f4f8;
   --muted: rgba(232, 244, 248, .72);
   --line: rgba(255, 255, 255, .16);
   --ghost: var(--accent);
-  --aman: #1f9d55;
-  --waspada: #f2b705;
-  --bahaya: #d33a3a;
+
+  /* Kontras warna status WCAG AA (rasio kontras >= 4.5:1) */
+  --aman: #15803d;      /* Rasio > 4.6:1 terhadap putih */
+  --waspada: #eab308;   /* Badge waspada memakai teks gelap */
+  --bahaya: #b91c1c;    /* Rasio > 5.5:1 terhadap putih */
   --font-head: "Bricolage Grotesque", "Figtree", "Segoe UI", system-ui, sans-serif;
   font-family: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
@@ -55,11 +57,19 @@ input, select, textarea {
 }
 label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--muted); }
 
-/* Kartu putih (seperti referensi): di dalamnya warna teks kembali gelap. */
+/* Kartu putih: Link & teks di dalamnya wajib kontras tinggi */
 .card {
-  --text: #17313e; --muted: #5b7380; --line: #d9e4ea; --ghost: #0b6e8f;
+  --text: #17313e; --muted: #4b6370; --line: #d9e4ea; --ghost: #08617f;
   background: #fff; color: var(--text); border: 1px solid var(--line);
   border-radius: 16px; padding: 18px;
+}
+.card a {
+  color: #0c6a85; /* Rasio kontras 5.2:1 terhadap background #ffffff */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.card a:hover {
+  color: #064051;
 }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
@@ -67,7 +77,6 @@ label { display: block; font-size: .9rem; margin-bottom: 10px; color: var(--mute
 .error { color: #ff9a9a; }
 .card .error { color: var(--bahaya); }
 
-/* ---------- tambahan: fokus, loading, kolom pencarian ---------- */
 :focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0; border-color: var(--primary); }
 button { transition: filter .15s, transform .15s; }
@@ -86,17 +95,28 @@ button:active:not(:disabled) { transform: translateY(1px); }
   * { transition: none !important; }
 }
 
-/* ---------- komponen bersama ---------- */
-/* Tautan bergaya tombol (Panel Petugas) */
+/* Screen reader only utility class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Komponen bersama */
 .btn {
   display: inline-block; padding: 9px 18px; border-radius: 999px; font-size: .88rem; font-weight: 600;
-  background: var(--primary); color: #fff; text-decoration: none; border: 1px solid var(--primary);
+  background: var(--primary); color: #fff; text-decoration: none !important; border: 1px solid var(--primary);
 }
 .btn:hover { filter: brightness(1.12); }
 .btn.ghost { background: transparent; color: var(--ghost); border-color: var(--ghost); }
 .btn.sm { padding: 6px 12px; font-size: .82rem; }
 
-/* Tabel data (Panel Petugas dan riwayat laporan) */
 .table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .data-table th, .data-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }

@@ -10,7 +10,15 @@ defineEmits(["log"]);
 <template>
   <div class="card table-wrap">
     <table class="data-table">
-      <thead><tr><th>Pantai</th><th>Status</th><th>Laporan hari ini</th><th>Laporan terakhir</th><th></th></tr></thead>
+      <thead>
+        <tr>
+          <th scope="col">Pantai</th>
+          <th scope="col">Status</th>
+          <th scope="col">Laporan hari ini</th>
+          <th scope="col">Laporan terakhir</th>
+          <th scope="col"><span class="sr-only">Aksi</span></th>
+        </tr>
+      </thead>
       <tbody>
         <tr v-for="s in spots" :key="s.id">
           <td><strong>{{ s.nama_pantai }}</strong><br /><span class="muted">{{ s.kabupaten }}</span></td>
@@ -21,7 +29,7 @@ defineEmits(["log"]);
             </span>
           </td>
           <td class="muted">{{ s.kondisi_updated_at ? timeAgo(s.kondisi_updated_at) : "Belum ada" }}</td>
-          <td class="row-actions"><button class="sm" @click="$emit('log', s.id)">Catat</button></td>
+          <td class="row-actions"><button type="button" class="sm" @click="$emit('log', s.id)">Catat</button></td>
         </tr>
         <tr v-if="!spots.length"><td colspan="5" class="muted">Belum ada data pantai.</td></tr>
       </tbody>

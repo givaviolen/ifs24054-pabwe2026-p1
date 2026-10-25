@@ -1,11 +1,13 @@
 <template>
   <section class="card nf">
-    <h2>Halaman tidak ditemukan</h2>
+    <h1>Halaman tidak ditemukan</h1>
     <p class="muted">Alamat yang Anda buka tidak ada.</p>
-    <a href="/beranda">← Kembali ke beranda</a>
+    <a href="/beranda" class="btn">← Kembali ke beranda</a>
   </section>
 </template>
 
 <style scoped>
 .nf { max-width: 480px; margin: 40px auto; text-align: center; }
+.nf h1 { font-size: 1.5rem; margin-bottom: 12px; }
+.nf p { margin-bottom: 20px; }
 </style>

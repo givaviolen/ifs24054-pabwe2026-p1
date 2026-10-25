@@ -11,21 +11,21 @@ const kawasan = ["Toba", "Samosir", "Simalungun", "Karo", "Dairi", "Humbang Hasu
       </div>
 
       <nav aria-label="Navigasi footer">
-        <h4>Navigasi</h4>
+        <p class="foot-title">Navigasi</p>
         <a href="/beranda">Beranda</a>
         <a href="/daftar">Daftar Pantai</a>
         <a href="/peta">Peta Status</a>
       </nav>
 
       <div>
-        <h4>Petugas</h4>
+        <p class="foot-title">Petugas</p>
         <a href="/auth/login">Login</a>
         <a href="/auth/register">Registrasi</a>
         <span class="plain">Khusus petugas lapangan dan pengelola pesisir.</span>
       </div>
 
       <div>
-        <h4>Kawasan</h4>
+        <p class="foot-title">Kawasan</p>
         <ul class="chips">
           <li v-for="k in kawasan" :key="k">{{ k }}</li>
         </ul>
@@ -44,7 +44,14 @@ const kawasan = ["Toba", "Samosir", "Simalungun", "Karo", "Dairi", "Humbang Hasu
 .cols { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr; gap: 32px; }
 .logo { display: block; font-family: var(--font-head); font-size: 1.15rem; color: #fff; margin-bottom: 10px; }
 .brand p { margin: 0; font-size: .85rem; line-height: 1.6; color: var(--muted); max-width: 280px; }
-h4 { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.foot-title {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+  font-weight: 700;
+}
 a, .plain { display: block; font-size: .88rem; margin-bottom: 10px; line-height: 1.5; }
 a { color: var(--text); text-decoration: none; }
 a:hover { color: var(--accent); }

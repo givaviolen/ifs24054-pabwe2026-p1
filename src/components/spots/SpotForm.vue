@@ -22,7 +22,7 @@ const submit = () => emit("save", toSpotPayload(form));
 
 <template>
   <form class="card" @submit.prevent="submit">
-    <h3>{{ spot ? "Ubah" : "Tambah" }} Data Pantai</h3>
+    <h2>{{ spot ? "Ubah" : "Tambah" }} Data Pantai</h2>
     <label>Nama pantai <input v-model="form.nama_pantai" maxlength="100" required /></label>
     <label>Kabupaten <input v-model="form.kabupaten" maxlength="60" required /></label>
     <label>Kedalaman rata-rata (m) <input v-model="form.kedalaman_avg" type="number" step="0.1" min="0" /></label>
@@ -44,6 +44,7 @@ const submit = () => emit("save", toSpotPayload(form));
 </template>
 
 <style scoped>
+h2 { font-size: 1.25rem; margin-bottom: 12px; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row input { width: auto; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

@@ -9,7 +9,15 @@ defineEmits(["edit", "remove"]);
 <template>
   <div class="card table-wrap">
     <table class="data-table">
-      <thead><tr><th>Pantai</th><th>Kabupaten</th><th>Status</th><th>Laporan terakhir</th><th></th></tr></thead>
+      <thead>
+        <tr>
+          <th scope="col">Pantai</th>
+          <th scope="col">Kabupaten</th>
+          <th scope="col">Status</th>
+          <th scope="col">Laporan terakhir</th>
+          <th scope="col"><span class="sr-only">Aksi</span></th>
+        </tr>
+      </thead>
       <tbody>
         <tr v-for="s in spots" :key="s.id">
           <td><strong>{{ s.nama_pantai }}</strong></td>
@@ -23,8 +31,8 @@ defineEmits(["edit", "remove"]);
           </td>
           <td class="row-actions">
             <a class="btn ghost sm" :href="`/petugas/kondisi?spot=${s.id}`">Catat</a>
-            <button class="ghost" @click="$emit('edit', s)">Ubah</button>
-            <button class="danger" @click="$emit('remove', s)">Hapus</button>
+            <button type="button" class="ghost" @click="$emit('edit', s)">Ubah</button>
+            <button type="button" class="danger" @click="$emit('remove', s)">Hapus</button>
           </td>
         </tr>
         <tr v-if="!spots.length"><td colspan="5" class="muted">Tidak ada pantai yang cocok.</td></tr>
@@ -35,5 +43,5 @@ defineEmits(["edit", "remove"]);
 
 <style scoped>
 .row-actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; align-items: center; }
-.row-actions button { padding: 6px 12px; font-size: .82rem; }
+.row-actions button, .row-actions .btn { padding: 6px 12px; font-size: .82rem; }
 </style>
