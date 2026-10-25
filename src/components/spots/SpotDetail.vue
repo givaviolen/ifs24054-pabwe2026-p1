@@ -13,18 +13,23 @@ const spot = ref(null);
 const error = ref(null);
 
 async function load(id) {
-  spot.value = null; error.value = null;
-  try { spot.value = await getSpot(id); }
-  catch (e) { error.value = describeError(e, "Gagal memuat detail pantai."); }
+  spot.value = null;
+  error.value = null;
+  try {
+    spot.value = await getSpot(id);
+  } catch (e) {
+    error.value = describeError(e, "Gagal memuat detail pantai.");
+  }
 }
 watch(() => props.spotId, load, { immediate: true });
 
 const latest = computed(() => spot.value?.history?.[0] || null);
 const meta = computed(() => statusMeta(spot.value?.current_status));
 const hasCoords = computed(() => spot.value?.latitude != null && spot.value?.longitude != null);
-const mapsUrl = computed(
-  () => `https://www.google.com/maps/search/?api=1&query=${spot.value.latitude},${spot.value.longitude}`
-);
+const mapsUrl = computed(() => {
+  if (!spot.value?.latitude || !spot.value?.longitude) return "#";
+  return `https://www.google.com/maps/search/?api=1&query=${spot.value.latitude},${spot.value.longitude}`;
+});
 </script>
 
 <template>
@@ -47,7 +52,7 @@ const mapsUrl = computed(
         <StatusBadge :status="spot.current_status" />
       </div>
 
-      <div class="advice" :class="spot.current_status.toLowerCase()">
+      <div class="advice" :class="(spot.current_status || '').toLowerCase()">
         <strong>{{ meta.icon }} {{ meta.label }}</strong>
         <span>{{ meta.advice }}</span>
       </div>
@@ -79,14 +84,23 @@ const mapsUrl = computed(
 
       <div class="card">
         <h3>Riwayat Laporan Petugas</h3>
-        <p v-if="!spot.history.length" class="muted">Belum ada laporan.</p>
+        <p v-if="!spot.history || !spot.history.length" class="muted">Belum ada laporan.</p>
         <div v-else class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Waktu</th><th>Eceng gondok</th><th>Ombak</th><th>Catatan</th></tr></thead>
+            <thead>
+              <tr>
+                <th scope="col">Waktu</th>
+                <th scope="col">Eceng gondok</th>
+                <th scope="col">Ombak</th>
+                <th scope="col">Catatan</th>
+              </tr>
+            </thead>
             <tbody>
               <tr v-for="h in spot.history" :key="h.id">
-                <td>{{ formatWib(h.updated_at) }}</td><td>{{ h.kondisi_eceng_gondok }}</td>
-                <td>{{ h.tinggi_ombak }}</td><td>{{ h.catatan_petugas || "-" }}</td>
+                <td>{{ formatWib(h.updated_at) }}</td>
+                <td>{{ h.kondisi_eceng_gondok }}</td>
+                <td>{{ h.tinggi_ombak }}</td>
+                <td>{{ h.catatan_petugas || "-" }}</td>
               </tr>
             </tbody>
           </table>

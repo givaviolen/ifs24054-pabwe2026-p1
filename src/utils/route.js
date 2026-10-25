@@ -20,7 +20,7 @@ AUTH_PAGES.has = function (item) {
  * #/peta -> /peta
  * #bagian atau "" -> null
  */
-export function hashToPath(hash = (typeof globalThis.window === "undefined" ? "" : globalThis.location.hash)) {
+export function hashToPath(hash = (globalThis.location ? globalThis.location.hash : "")) {
   if (!hash || typeof hash !== "string") return null;
   if (!hash.startsWith("#/")) return null;
   return hash.slice(1);
@@ -29,7 +29,7 @@ export function hashToPath(hash = (typeof globalThis.window === "undefined" ? ""
 /**
  * Parsing path string menjadi objek route beserta query parameter
  */
-export function parsePath(pathname = (typeof globalThis.window === "undefined" ? "/" : globalThis.location.pathname)) {
+export function parsePath(pathname = (globalThis.location ? globalThis.location.pathname : "/")) {
   if (!pathname) return { name: "notfound", query: {} };
 
   const [pathOnly, queryPart] = pathname.split("?");

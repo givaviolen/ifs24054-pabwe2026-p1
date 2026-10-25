@@ -4,7 +4,6 @@ import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { COLORS, ZONE_RADIUS_M, buildSpotInfo } from "../../utils/mapShared";
 
-// Peta OpenStreetMap (tanpa API key). Dipakai bila Google Maps belum diatur atau ditolak.
 const props = defineProps({ spots: { type: Array, default: () => [] } });
 const emit = defineEmits(["select"]);
 
@@ -34,18 +33,23 @@ function draw() {
 }
 
 onMounted(() => {
-  map = L.map(mapEl.value).setView([2.65, 98.9], 9); // Danau Toba
+  map = L.map(mapEl.value).setView([2.65, 98.9], 9);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
   }).addTo(map);
   layer = L.layerGroup().addTo(map);
   draw();
-  setTimeout(() => map && map.invalidateSize(), 0);
+  setTimeout(() => {
+    if (map) map.invalidateSize();
+  }, 0);
 });
 
 watch(() => props.spots, draw);
-onBeforeUnmount(() => { map?.remove(); map = null; });
+onBeforeUnmount(() => {
+  map?.remove();
+  map = null;
+});
 </script>
 
 <template>
@@ -53,7 +57,6 @@ onBeforeUnmount(() => { map?.remove(); map = null; });
 </template>
 
 <style scoped>
-/* isolation: agar lapisan peta tidak menutupi navbar saat halaman di-scroll */
 .map { width: 100%; height: 560px; border-radius: 16px; border: 1px solid var(--line); background: #dfeaf0; position: relative; z-index: 0; isolation: isolate; }
 @media (max-width: 600px) { .map { height: 420px; } }
 </style>
