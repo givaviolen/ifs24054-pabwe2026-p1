@@ -20,7 +20,7 @@ AUTH_PAGES.has = function (item) {
  * #/peta -> /peta
  * #bagian atau "" -> null
  */
-export function hashToPath(hash = (typeof window !== "undefined" ? window.location.hash : "")) {
+export function hashToPath(hash = (typeof globalThis.window === "undefined" ? "" : globalThis.location.hash)) {
   if (!hash || typeof hash !== "string") return null;
   if (!hash.startsWith("#/")) return null;
   return hash.slice(1);
@@ -29,7 +29,7 @@ export function hashToPath(hash = (typeof window !== "undefined" ? window.locati
 /**
  * Parsing path string menjadi objek route beserta query parameter
  */
-export function parsePath(pathname = (typeof window !== "undefined" ? window.location.pathname : "/")) {
+export function parsePath(pathname = (typeof globalThis.window === "undefined" ? "/" : globalThis.location.pathname)) {
   if (!pathname) return { name: "notfound", query: {} };
 
   const [pathOnly, queryPart] = pathname.split("?");
@@ -50,7 +50,8 @@ export function parsePath(pathname = (typeof window !== "undefined" ? window.loc
   if (clean === "/peta") return { name: "map", query };
 
   // Detail pantai: /pantai/:id
-  const spotMatch = clean.match(/^\/pantai\/(\d+)$/);
+  const spotRegex = /^\/pantai\/(\d+)$/;
+  const spotMatch = spotRegex.exec(clean);
   if (spotMatch) {
     return { name: "detail", id: Number(spotMatch[1]), query };
   }
@@ -64,7 +65,8 @@ export function parsePath(pathname = (typeof window !== "undefined" ? window.loc
   if (clean === "/petugas/pantai") return { name: "admin-spots", query };
 
   // Menangani rute dinamis /petugas/pantai/:id
-  const adminSpotMatch = clean.match(/^\/petugas\/pantai\/(\d+)$/);
+  const adminSpotRegex = /^\/petugas\/pantai\/(\d+)$/;
+  const adminSpotMatch = adminSpotRegex.exec(clean);
   if (adminSpotMatch) {
     return { name: "admin-spots", editId: Number(adminSpotMatch[1]), query };
   }

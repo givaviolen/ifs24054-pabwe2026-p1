@@ -50,7 +50,7 @@ function onLogSaved(info) {
       <a v-for="t in ADMIN_TABS" :key="t.name" :href="t.href" :class="{ on: page === t.name }">{{ t.label }}</a>
     </nav>
 
-    <p v-if="notice" class="notice" :class="notice.type" role="status">{{ notice.text }}</p>
+    <output v-if="notice" class="notice" :class="notice.type">{{ notice.text }}</output>
 
     <AdminSummary v-if="page === 'admin'" :spots="allSpots" />
 
@@ -78,7 +78,7 @@ function onLogSaved(info) {
 .tabs a:hover { color: #fff; }
 .tabs a.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
 
-.notice { padding: 10px 14px; border-radius: 12px; font-size: .92rem; margin: 8px 0 14px; }
+.notice { display: block; padding: 10px 14px; border-radius: 12px; font-size: .92rem; margin: 8px 0 14px; }
 .notice.ok { background: #dff3e7; color: #17653c; }
 .notice.err { background: #fbd9d9; color: #8c2b2b; }
 

@@ -7,14 +7,15 @@ export function parseSqlDate(str) {
   if (!str || typeof str !== "string") return null;
 
   // Tangani format SQL "YYYY-MM-DD HH:MM:SS" sebagai UTC
-  const sqlMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+  const sqlRegex = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/;
+  const sqlMatch = sqlRegex.exec(str);
   if (sqlMatch) {
     const [, y, m, d, h, min, s] = sqlMatch;
     return new Date(Date.UTC(+y, +m - 1, +d, +h, +min, +s));
   }
 
   const d = new Date(str);
-  return isNaN(d.getTime()) ? null : d;
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 /**
@@ -73,5 +74,5 @@ export function formatWib(dateInput) {
   };
 
   const formatted = new Intl.DateTimeFormat("id-ID", options).format(date);
-  return `${formatted.replace(/\./g, ":")} WIB`;
+  return `${formatted.replaceAll(".", ":")} WIB`;
 }

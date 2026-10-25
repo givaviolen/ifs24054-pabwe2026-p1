@@ -8,9 +8,12 @@ export function useNotice(durationMs = 5000) {
   function notify(type, text) {
     notice.value = { type, text };
     clearTimeout(timer);
-    timer = setTimeout(() => { notice.value = null; }, durationMs);
+    timer = setTimeout(() => {
+      notice.value = null;
+    }, durationMs);
   }
 
   onBeforeUnmount(() => clearTimeout(timer));
+
   return { notice, notify };
 }
