@@ -10,7 +10,7 @@ const authListeners = new Set();
 // Google memanggil fungsi global ini bila API key ditolak (setelah skrip termuat).
 globalThis.gm_authFailure = () => {
   authFailed = true;
-  authListeners.forEach((fn) => fn());
+  for (const fn of authListeners) fn();
 };
 
 export function onMapsAuthFailure(fn) {

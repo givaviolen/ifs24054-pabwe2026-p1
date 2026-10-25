@@ -22,7 +22,7 @@ function fail(reason) {
 }
 
 function clearOverlays() {
-  overlays.forEach((o) => o.setMap(null));
+  for (const o of overlays) o.setMap(null);
   overlays = [];
 }
 

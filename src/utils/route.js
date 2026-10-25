@@ -26,6 +26,53 @@ export function hashToPath(hash = (globalThis.location ? globalThis.location.has
   return hash.slice(1);
 }
 
+// Rute statis: path -> nama rute.
+const STATIC_ROUTES = {
+  "/": "home",
+  "/beranda": "home",
+  "/daftar": "list",
+  "/peta": "map",
+  "/auth/login": "login",
+  "/auth/register": "register",
+  "/petugas": "admin",
+  "/petugas/pantai": "admin-spots",
+  "/petugas/pantai/tambah": "admin-spot-new",
+  "/petugas/kondisi": "admin-log",
+};
+
+// Rute dinamis: pola path -> pembuat objek rute (tanpa query).
+const DYNAMIC_ROUTES = [
+  { pattern: /^\/pantai\/(\d+)$/, build: (id) => ({ name: "detail", id }) },
+  { pattern: /^\/petugas\/pantai\/(\d+)$/, build: (id) => ({ name: "admin-spots", editId: id }) },
+];
+
+// Menghapus garis miring di akhir path (kecuali karakter pertama).
+function stripTrailingSlashes(path) {
+  let end = path.length;
+  while (end > 1 && path[end - 1] === "/") end--;
+  return path.slice(0, end) || "/";
+}
+
+function parseQuery(queryPart) {
+  const query = {};
+  if (!queryPart) return query;
+  for (const [key, val] of new URLSearchParams(queryPart)) {
+    query[key] = val;
+  }
+  return query;
+}
+
+function matchRoute(clean) {
+  const staticName = STATIC_ROUTES[clean];
+  if (staticName) return { name: staticName };
+
+  for (const { pattern, build } of DYNAMIC_ROUTES) {
+    const match = pattern.exec(clean);
+    if (match) return build(Number(match[1]));
+  }
+  return { name: "notfound" };
+}
+
 /**
  * Parsing path string menjadi objek route beserta query parameter
  */
@@ -33,59 +80,9 @@ export function parsePath(pathname = (globalThis.location ? globalThis.location.
   if (!pathname) return { name: "notfound", query: {} };
 
   const [pathOnly, queryPart] = pathname.split("?");
+  const clean = stripTrailingSlashes(pathOnly);
 
-  let end = pathOnly.length;
-  for (let i = pathOnly.length - 1; i > 0; i--) {
-    if (pathOnly[i] === "/") {
-      end = i;
-    } else {
-      break;
-    }
-  }
-
-  const clean = pathOnly.slice(0, end) || "/";
-
-  // Parsing query parameter
-  const query = {};
-  if (queryPart) {
-    const searchParams = new URLSearchParams(queryPart);
-    searchParams.forEach((val, key) => {
-      query[key] = val;
-    });
-  }
-
-  // Halaman publik utama
-  if (clean === "/" || clean === "/beranda") return { name: "home", query };
-  if (clean === "/daftar") return { name: "list", query };
-  if (clean === "/peta") return { name: "map", query };
-
-  // Detail pantai: /pantai/:id
-  const spotRegex = /^\/pantai\/(\d+)$/;
-  const spotMatch = spotRegex.exec(clean);
-  if (spotMatch) {
-    return { name: "detail", id: Number(spotMatch[1]), query };
-  }
-
-  // Halaman autentikasi
-  if (clean === "/auth/login") return { name: "login", query };
-  if (clean === "/auth/register") return { name: "register", query };
-
-  // Area petugas
-  if (clean === "/petugas") return { name: "admin", query };
-  if (clean === "/petugas/pantai") return { name: "admin-spots", query };
-
-  // Menangani rute dinamis /petugas/pantai/:id
-  const adminSpotRegex = /^\/petugas\/pantai\/(\d+)$/;
-  const adminSpotMatch = adminSpotRegex.exec(clean);
-  if (adminSpotMatch) {
-    return { name: "admin-spots", editId: Number(adminSpotMatch[1]), query };
-  }
-
-  if (clean === "/petugas/pantai/tambah") return { name: "admin-spot-new", query };
-  if (clean === "/petugas/kondisi") return { name: "admin-log", query };
-
-  // Fallback
-  return { name: "notfound", query };
+  return { ...matchRoute(clean), query: parseQuery(queryPart) };
 }
 
 export const parseRoute = parsePath;
