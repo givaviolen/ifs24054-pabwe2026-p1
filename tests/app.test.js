@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, test, expect, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { flush, mount, spotFixture } from "./helpers";
 
 vi.mock("../src/services/spotApi", () => ({
@@ -27,6 +27,18 @@ import App from "../src/App.vue";
 const SPOTS = [spotFixture({ id: 1, nama_pantai: "Alpha" }), spotFixture({ id: 2, nama_pantai: "Bravo", current_status: "WASPADA" })];
 
 let current;
+
+// Halaman selain beranda dimuat secara lazy; panaskan dulu agar tes tidak menunggu transformasi modul.
+beforeAll(async () => {
+  await Promise.all([
+    import("../src/views/SpotsView.vue"),
+    import("../src/views/AdminView.vue"),
+    import("../src/views/NotFoundView.vue"),
+    import("../src/components/spots/SpotDetail.vue"),
+    import("../src/components/auth/LoginPanel.vue"),
+  ]);
+});
+
 const open = async (path, token = false) => {
   if (token) setToken("tok");
   go(path, { replace: true });
@@ -80,6 +92,19 @@ describe("App", () => {
     await flush(2);
     expect(window.location.pathname).toBe("/daftar");
     expect(m.el.querySelector("main h1").textContent).toBe("Daftar Pantai");
+  });
+
+  test("bila halaman belum selesai dimuat, data baru diminta setelah event load", async () => {
+    Object.defineProperty(document, "readyState", { configurable: true, get: () => "loading" });
+    go("/beranda", { replace: true });
+    current = mount(App);
+    await flush(2);
+    expect(api.getSpots).not.toHaveBeenCalled();
+    delete document.readyState;
+    window.dispatchEvent(new Event("load"));
+    await flush(4);
+    expect(api.getSpots).toHaveBeenCalled();
+    expect(authApi.meRequest).not.toHaveBeenCalled();
   });
 
   test("halaman login tampil setelah sesi diperiksa", async () => {

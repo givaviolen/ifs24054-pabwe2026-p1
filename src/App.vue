@@ -1,18 +1,20 @@
 <script setup>
-import { onMounted } from "vue";
+import { defineAsyncComponent, onMounted } from "vue";
 import Navbar from "./components/layout/Navbar.vue";
 import Footer from "./components/layout/Footer.vue";
 import ApiAlert from "./components/common/ApiAlert.vue";
-import SpotDetail from "./components/spots/SpotDetail.vue";
-import LoginPanel from "./components/auth/LoginPanel.vue";
 import HomeView from "./views/HomeView.vue";
-import SpotsView from "./views/SpotsView.vue";
-import AdminView from "./views/AdminView.vue";
-import NotFoundView from "./views/NotFoundView.vue";
 import { route, go, backPath } from "./composables/useRoute";
 import { auth, restoreSession, logout } from "./composables/useAuth";
 import { useRouteGuard } from "./composables/useRouteGuard";
 import { loadSpots } from "./composables/useSpots";
+
+// Halaman selain beranda dimuat saat dibutuhkan agar bundel awal lebih kecil.
+const SpotsView = defineAsyncComponent(() => import("./views/SpotsView.vue"));
+const SpotDetail = defineAsyncComponent(() => import("./components/spots/SpotDetail.vue"));
+const LoginPanel = defineAsyncComponent(() => import("./components/auth/LoginPanel.vue"));
+const AdminView = defineAsyncComponent(() => import("./views/AdminView.vue"));
+const NotFoundView = defineAsyncComponent(() => import("./views/NotFoundView.vue"));
 
 const { isProtected, isAuthPage } = useRouteGuard();
 
@@ -21,9 +23,19 @@ async function doLogout() {
   go("/beranda");
 }
 
+// Permintaan ke API baru dikirim setelah halaman selesai dimuat agar tidak
+// menjadi rantai permintaan kritis yang menunda tampilan awal.
+function afterPageLoad(task) {
+  const run = () => setTimeout(task, 0);
+  if (document.readyState === "complete") run();
+  else window.addEventListener("load", run, { once: true });
+}
+
 onMounted(() => {
-  loadSpots();
-  restoreSession();
+  afterPageLoad(() => {
+    loadSpots();
+    restoreSession();
+  });
 });
 </script>
 
