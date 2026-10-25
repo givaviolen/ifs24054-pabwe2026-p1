@@ -1,42 +1,29 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
-// Menyisipkan CSS awal langsung ke HTML agar tidak ada permintaan yang memblokir render,
-// dan memberi prioritas rendah pada skrip modul agar tidak membentuk rantai permintaan kritis.
-function optimizeEntryAssets() {
+// Menyisipkan CSS utama langsung ke index.html agar tidak menjadi permintaan
+// yang memblokir render (render-blocking). Meningkatkan FCP dan LCP.
+function inlineCriticalCss() {
   return {
-    name: "optimize-entry-assets",
+    name: "inline-critical-css",
     apply: "build",
     enforce: "post",
     transformIndexHtml: {
       order: "post",
       handler(html, ctx) {
-        const bundle = ctx.bundle ?? {};
-        return html
-          .replace(/<link rel="stylesheet"[^>]*href="\/([^"]+\.css)"[^>]*>/g, (tag, file) => {
-            const asset = bundle[file];
-            return asset ? `<style>${asset.source}</style>` : tag;
-          })
-          .replace('<script type="module"', '<script type="module" fetchpriority="low"');
+        const bundle = ctx.bundle || {};
+        return html.replace(/<link rel="stylesheet"[^>]*href="\/(assets\/[^"]+\.css)"[^>]*>/g, (tag, file) => {
+          const asset = bundle[file];
+          if (!asset || asset.type !== "asset") return tag;
+          return `<style>${String(asset.source)}</style>`;
+        });
       },
     },
   };
 }
 
 export default defineConfig({
-  plugins: [vue(), optimizeEntryAssets()],
-  resolve: {
-    alias: {
-      "bun:test": "vitest",
-    },
-  },
-  test: {
-    globals: true,
-    environment: "happy-dom",
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "lcov", "html"],
-      reportsDirectory: "./coverage",
-    },
-  },
+  plugins: [vue(), inlineCriticalCss()],
+  server: { port: 5173 },
+  preview: { port: 5173 },
 });

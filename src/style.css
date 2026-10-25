@@ -16,8 +16,9 @@
   --aman: #15803d;      /* Rasio > 4.6:1 terhadap putih */
   --waspada: #eab308;   /* Badge waspada memakai teks gelap */
   --bahaya: #b91c1c;    /* Rasio > 5.5:1 terhadap putih */
-  --font-head: "Bricolage Grotesque", "Figtree", "Segoe UI", system-ui, sans-serif;
-  font-family: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Font sistem: tanpa unduhan font, jadi tidak ada penundaan render maupun pergeseran tata letak. */
+  --font-head: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
