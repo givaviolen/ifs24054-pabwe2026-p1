@@ -11,14 +11,19 @@ defineEmits(["close"]);
 
 const spot = ref(null);
 const error = ref(null);
+let latestRequest = 0;
 
 async function load(id) {
+  const requestId = ++latestRequest;
   spot.value = null;
   error.value = null;
   try {
-    spot.value = await getSpot(id);
+    const result = await getSpot(id);
+    if (requestId === latestRequest) spot.value = result;
   } catch (e) {
-    error.value = describeError(e, "Gagal memuat detail pantai.");
+    if (requestId === latestRequest) {
+      error.value = describeError(e, "Gagal memuat detail pantai.");
+    }
   }
 }
 watch(() => props.spotId, load, { immediate: true });

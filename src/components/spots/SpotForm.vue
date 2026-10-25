@@ -1,7 +1,7 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { STATUS_KEYS } from "../../constants/status";
-import { toSpotPayload } from "../../utils/spotForm";
+import { toSpotPayload, validateSpotForm } from "../../utils/spotForm";
 
 const props = defineProps({ spot: Object });
 const emit = defineEmits(["save", "cancel"]);
@@ -17,19 +17,37 @@ const form = reactive({
   longitude: props.spot?.longitude ?? "",
 });
 
-const submit = () => emit("save", toSpotPayload(form));
+const errors = ref({});
+
+function submit() {
+  errors.value = validateSpotForm(form);
+  if (Object.keys(errors.value).length > 0) return;
+  emit("save", toSpotPayload(form));
+}
 </script>
 
 <template>
   <form class="card" @submit.prevent="submit">
     <h2>{{ spot ? "Ubah" : "Tambah" }} Data Pantai</h2>
-    <label>Nama pantai <input v-model="form.nama_pantai" maxlength="100" required /></label>
-    <label>Kabupaten <input v-model="form.kabupaten" maxlength="60" required /></label>
-    <label>Kedalaman rata-rata (m) <input v-model="form.kedalaman_avg" type="number" step="0.1" min="0" /></label>
+    <label>Nama pantai
+      <input v-model="form.nama_pantai" maxlength="100" required :aria-invalid="!!errors.nama_pantai" aria-describedby="spot-name-error" />
+      <small v-if="errors.nama_pantai" id="spot-name-error" class="field-error" role="alert">{{ errors.nama_pantai }}</small>
+    </label>
+    <label>Kabupaten
+      <input v-model="form.kabupaten" maxlength="60" required :aria-invalid="!!errors.kabupaten" aria-describedby="spot-district-error" />
+      <small v-if="errors.kabupaten" id="spot-district-error" class="field-error" role="alert">{{ errors.kabupaten }}</small>
+    </label>
+    <label>Kedalaman rata-rata (m)
+      <input v-model="form.kedalaman_avg" type="number" step="0.1" min="0" :aria-invalid="!!errors.kedalaman_avg" />
+      <small v-if="errors.kedalaman_avg" class="field-error" role="alert">{{ errors.kedalaman_avg }}</small>
+    </label>
     <div class="pair">
-      <label>Latitude <input v-model="form.latitude" type="number" step="any" min="-90" max="90" placeholder="2.5780" /></label>
-      <label>Longitude <input v-model="form.longitude" type="number" step="any" min="-180" max="180" placeholder="98.7010" /></label>
+      <label>Latitude <input v-model="form.latitude" type="number" step="any" min="-90" max="90" placeholder="2.5780" :aria-invalid="!!errors.latitude" /></label>
+      <label>Longitude <input v-model="form.longitude" type="number" step="any" min="-180" max="180" placeholder="98.7010" :aria-invalid="!!errors.longitude" /></label>
     </div>
+    <p v-if="errors.latitude || errors.longitude || errors.coordinates" class="field-error" role="alert">
+      {{ errors.latitude || errors.longitude || errors.coordinates }}
+    </p>
     <p class="muted hint">Tips: di Google Maps, klik kanan pada lokasi pantai lalu klik angka koordinat di bagian atas menu untuk menyalinnya.</p>
     <label>Status
       <select v-model="form.current_status"><option v-for="key in STATUS_KEYS" :key="key">{{ key }}</option></select>
@@ -45,6 +63,8 @@ const submit = () => emit("save", toSpotPayload(form));
 
 <style scoped>
 h2 { font-size: 1.25rem; margin-bottom: 12px; }
+.field-error { display: block; color: #b42318; font-size: .82rem; margin-top: 4px; }
+input[aria-invalid="true"] { border-color: #b42318; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row input { width: auto; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

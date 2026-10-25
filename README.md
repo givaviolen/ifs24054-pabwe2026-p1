@@ -1,6 +1,6 @@
 # TobaWaterSafe — Front-End (`ifs24054-pabwe2026-p1`)
 
-Antarmuka web **Vue 3 + Vite** (axios) untuk memantau status kelayakan zona berenang dan kondisi pesisir
+Antarmuka web **Vue 3 + Vite** untuk memantau status kelayakan zona berenang dan kondisi pesisir
 Danau Toba. Package manager & runtime: **Bun**. CI: **Jenkins**. Deploy: **Vercel**.
 
 Back-End (Express + SQLite) ada di repo terpisah: `ifs24054-pabwe2026-proyek1-be`.
@@ -11,7 +11,7 @@ Back-End (Express + SQLite) ada di repo terpisah: `ifs24054-pabwe2026-proyek1-be
 
 ## Struktur
 
-View hanya merakit komponen; logika ada di composable/utils; akses API ada di services.
+View hanya merakit komponen; logika ada di composable/utils; akses API ada di services. Klien HTTP menggunakan Fetch API dengan timeout, retry terbatas untuk GET, dan normalisasi error.
 
 ```
 src/

@@ -17,7 +17,9 @@ export const kabupatenList = computed(() =>
 export const filtersActive = computed(() => hasActiveFilters(filters));
 export const sortedSpots = computed(() => sortSpots(spots.value, sortBy.value));
 
-let requestSeq = 0; // penanda permintaan terbaru, agar respons lama tidak menimpa yang baru
+let requestSeq = 0; // Respons lama tidak boleh menimpa hasil permintaan terbaru.
+let filterTimer = null;
+const FILTER_DEBOUNCE_MS = 250;
 
 export async function loadSpots() {
   const mine = ++requestSeq;
