@@ -1,5 +1,6 @@
 import { ref, onBeforeUnmount } from "vue";
 
+// Pesan singkat (sukses/gagal) yang hilang sendiri. Panggil di dalam setup().
 export function useNotice(durationMs = 5000) {
   const notice = ref(null);
   let timer;
