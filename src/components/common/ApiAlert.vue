@@ -1,5 +1,5 @@
 <script setup>
-import { apiError, dismissApiError, loadSpots, loading } from "../composables/useSpots";
+import { apiError, dismissApiError, loadSpots, loading } from "../../composables/useSpots";
 </script>
 
 <template>

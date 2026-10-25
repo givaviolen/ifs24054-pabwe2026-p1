@@ -1,8 +1,8 @@
 <script setup>
 import { reactive, ref, computed, watch } from "vue";
-import { login, register } from "../composables/useAuth";
-import { describeError } from "../services/api";
-import { go } from "../composables/useRoute";
+import { login, register } from "../../composables/useAuth";
+import { describeError } from "../../services/apiError";
+import { go } from "../../composables/useRoute";
 
 const props = defineProps({ mode: { type: String, default: "login" } }); // login | register
 const isLogin = computed(() => props.mode !== "register");
@@ -44,17 +44,17 @@ async function submit() {
 
       <form @submit.prevent="submit">
         <label>Username
-          <input v-model="form.username" autocomplete="username" required />
+          <input id="username" v-model="form.username" name="username" autocomplete="username" maxlength="30" required />
         </label>
         <label v-if="!isLogin">Nama lengkap
-          <input v-model="form.nama" autocomplete="name" required />
+          <input id="nama" v-model="form.nama" name="nama" autocomplete="name" maxlength="60" required />
         </label>
         <label>Password
-          <input v-model="form.password" type="password" minlength="6"
+          <input id="password" v-model="form.password" name="password" type="password" minlength="6" maxlength="100"
                  :autocomplete="isLogin ? 'current-password' : 'new-password'" required />
         </label>
         <label v-if="!isLogin">Kode registrasi petugas
-          <input v-model="form.kode_petugas" type="password" autocomplete="off" required />
+          <input id="kode-petugas" v-model="form.kode_petugas" name="kode_petugas" type="password" autocomplete="off" required />
           <small>Kode diberikan oleh pengelola.</small>
         </label>
 
@@ -62,7 +62,7 @@ async function submit() {
           {{ error }}<small v-if="hint"><br />{{ hint }}</small>
         </p>
 
-        <button type="submit" class="submit" :disabled="loading">
+        <button id="btn-submit" type="submit" class="submit" :disabled="loading">
           {{ loading ? "Memproses…" : isLogin ? "Masuk" : "Daftar" }}
         </button>
       </form>

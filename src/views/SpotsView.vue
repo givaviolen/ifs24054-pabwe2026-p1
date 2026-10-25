@@ -1,7 +1,7 @@
 <script setup>
-import FilterBar from "../components/FilterBar.vue";
-import SpotCard from "../components/SpotCard.vue";
-import MapView from "../components/MapView.vue";
+import FilterBar from "../components/spots/FilterBar.vue";
+import SpotCard from "../components/spots/SpotCard.vue";
+import MapView from "../components/map/MapView.vue";
 import {
   filters, spots, sortedSpots, sortBy, loading, apiError, kabupatenList, filtersActive, resetFilters,
 } from "../composables/useSpots";

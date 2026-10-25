@@ -1,7 +1,9 @@
 <script setup>
 import { reactive, ref, computed } from "vue";
-import { addCondition, describeError } from "../services/api";
-import { deriveStatus, STATUS_INFO } from "../utils/format";
+import { addCondition } from "../../services/spotApi";
+import { describeError } from "../../services/apiError";
+import { STATUS_KEYS, ECENG_LEVELS, OMBAK_LEVELS, statusMeta } from "../../constants/status";
+import { deriveStatus } from "../../utils/status";
 
 const props = defineProps({ spots: Array, spotId: { type: Number, default: null } });
 const emit = defineEmits(["close", "saved"]);
@@ -19,6 +21,7 @@ const saving = ref(false);
 // Pratinjau status yang akan dipakai bila petugas tidak memilih status manual.
 const autoStatus = computed(() => deriveStatus(form.kondisi_eceng_gondok, form.tinggi_ombak));
 const finalStatus = computed(() => form.current_status || autoStatus.value);
+const finalMeta = computed(() => statusMeta(finalStatus.value));
 const spotName = computed(() => props.spots.find((s) => s.id === Number(form.spot_id))?.nama_pantai || "");
 
 async function submit() {
@@ -33,7 +36,7 @@ async function submit() {
 </script>
 
 <template>
-  <div class="overlay" @click.self="$emit('close')" @keydown.esc="$emit('close')">
+  <div class="overlay" role="dialog" aria-modal="true" aria-label="Laporan kondisi harian" @click.self="$emit('close')" @keydown.esc="$emit('close')">
     <form class="card modal" @submit.prevent="submit">
       <h3>Laporan Kondisi Harian</h3>
       <label>Pantai
@@ -43,23 +46,23 @@ async function submit() {
       </label>
       <div class="pair">
         <label>Eceng gondok
-          <select v-model="form.kondisi_eceng_gondok"><option>Bersih</option><option>Sedang</option><option>Pekat</option></select>
+          <select v-model="form.kondisi_eceng_gondok"><option v-for="level in ECENG_LEVELS" :key="level">{{ level }}</option></select>
         </label>
         <label>Tinggi ombak
-          <select v-model="form.tinggi_ombak"><option>Tenang</option><option>Sedang</option><option>Tinggi</option></select>
+          <select v-model="form.tinggi_ombak"><option v-for="level in OMBAK_LEVELS" :key="level">{{ level }}</option></select>
         </label>
       </div>
       <label>Status pantai
         <select v-model="form.current_status">
           <option value="">Otomatis dari kondisi ({{ autoStatus }})</option>
-          <option value="AMAN">AMAN</option><option value="WASPADA">WASPADA</option><option value="BAHAYA">BAHAYA (tutup darurat)</option>
+          <option v-for="key in STATUS_KEYS" :key="key" :value="key">{{ key }}{{ key === "BAHAYA" ? " (tutup darurat)" : "" }}</option>
         </select>
       </label>
       <p class="preview" :class="finalStatus.toLowerCase()">
-        Status setelah disimpan: <strong>{{ STATUS_INFO[finalStatus].icon }} {{ STATUS_INFO[finalStatus].label }}</strong>
+        Status setelah disimpan: <strong>{{ finalMeta.icon }} {{ finalMeta.label }}</strong>
       </p>
       <label>Catatan petugas
-        <textarea v-model="form.catatan_petugas" rows="3" maxlength="300" placeholder="Contoh: angin kencang dari barat, berenang dibatasi hingga 15.00"></textarea>
+        <textarea v-model="form.catatan_petugas" rows="3" maxlength="500" placeholder="Contoh: angin kencang dari barat, berenang dibatasi hingga 15.00"></textarea>
       </label>
       <p v-if="error" class="error" role="alert">{{ error }}</p>
       <div class="actions">

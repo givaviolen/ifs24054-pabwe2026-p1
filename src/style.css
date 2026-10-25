@@ -85,3 +85,18 @@ button:active:not(:disabled) { transform: translateY(1px); }
   .skeleton { animation: none; }
   * { transition: none !important; }
 }
+
+/* ---------- komponen bersama ---------- */
+/* Tautan bergaya tombol (Panel Petugas) */
+.btn {
+  display: inline-block; padding: 9px 18px; border-radius: 999px; font-size: .88rem; font-weight: 600;
+  background: var(--primary); color: #fff; text-decoration: none; border: 1px solid var(--primary);
+}
+.btn:hover { filter: brightness(1.12); }
+.btn.ghost { background: transparent; color: var(--ghost); border-color: var(--ghost); }
+.btn.sm { padding: 6px 12px; font-size: .82rem; }
+
+/* Tabel data (Panel Petugas dan riwayat laporan) */
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.data-table th, .data-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }

@@ -2,8 +2,8 @@
 import { ref, computed } from "vue";
 import GoogleMapPane from "./GoogleMapPane.vue";
 import LeafletMapPane from "./LeafletMapPane.vue";
-import { hasMapsKey, isMapsAuthFailed } from "../services/googleMaps";
-import { COLORS } from "../utils/mapShared";
+import { hasMapsKey, isMapsAuthFailed } from "../../services/googleMaps";
+import { COLORS } from "../../utils/mapShared";
 
 // Memilih peta: Google Maps bila API key valid, selain itu otomatis OpenStreetMap.
 const props = defineProps({ spots: { type: Array, default: () => [] } });
@@ -23,7 +23,7 @@ const withoutCoords = computed(
 );
 
 const notes = {
-  NO_KEY: "Menampilkan peta OpenStreetMap karena API key Google Maps belum diisi di frontend/.env.",
+  NO_KEY: "Menampilkan peta OpenStreetMap karena API key Google Maps belum diisi di file .env.",
   AUTH_FAILED: "Menampilkan peta OpenStreetMap karena Google Maps menolak API key (buka Console browser dengan F12 untuk melihat nama error-nya).",
   LOAD_FAILED: "Menampilkan peta OpenStreetMap karena Google Maps gagal dimuat.",
 };

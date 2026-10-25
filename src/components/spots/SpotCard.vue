@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref } from "vue";
-import StatusBadge from "./StatusBadge.vue";
-import { timeAgo } from "../utils/format";
-import { spotPhoto } from "../data/spotPhotos";
+import StatusBadge from "../common/StatusBadge.vue";
+import { timeAgo } from "../../utils/date";
+import { spotPhoto } from "../../data/spotPhotos";
 
 const props = defineProps({ spot: { type: Object, required: true } });
 const emit = defineEmits(["select"]);

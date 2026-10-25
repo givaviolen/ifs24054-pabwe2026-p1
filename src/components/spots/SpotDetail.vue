@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed, watch } from "vue";
-import { getSpot, describeError } from "../services/api";
-import StatusBadge from "./StatusBadge.vue";
-import { formatWib, timeAgo, STATUS_INFO } from "../utils/format";
+import { getSpot } from "../../services/spotApi";
+import { describeError } from "../../services/apiError";
+import StatusBadge from "../common/StatusBadge.vue";
+import { statusMeta } from "../../constants/status";
+import { formatWib, timeAgo } from "../../utils/date";
 
 const props = defineProps({ spotId: Number });
 defineEmits(["close"]);
@@ -18,7 +20,7 @@ async function load(id) {
 watch(() => props.spotId, load, { immediate: true });
 
 const latest = computed(() => spot.value?.history?.[0] || null);
-const advice = computed(() => STATUS_INFO[spot.value?.current_status]?.advice || "");
+const meta = computed(() => statusMeta(spot.value?.current_status));
 const hasCoords = computed(() => spot.value?.latitude != null && spot.value?.longitude != null);
 const mapsUrl = computed(
   () => `https://www.google.com/maps/search/?api=1&query=${spot.value.latitude},${spot.value.longitude}`
@@ -46,8 +48,8 @@ const mapsUrl = computed(
       </div>
 
       <div class="advice" :class="spot.current_status.toLowerCase()">
-        <strong>{{ STATUS_INFO[spot.current_status].icon }} {{ STATUS_INFO[spot.current_status].label }}</strong>
-        <span>{{ advice }}</span>
+        <strong>{{ meta.icon }} {{ meta.label }}</strong>
+        <span>{{ meta.advice }}</span>
       </div>
 
       <div class="two">
@@ -78,8 +80,8 @@ const mapsUrl = computed(
       <div class="card">
         <h3>Riwayat Laporan Petugas</h3>
         <p v-if="!spot.history.length" class="muted">Belum ada laporan.</p>
-        <div v-else class="wrap">
-          <table>
+        <div v-else class="table-wrap">
+          <table class="data-table">
             <thead><tr><th>Waktu</th><th>Eceng gondok</th><th>Ombak</th><th>Catatan</th></tr></thead>
             <tbody>
               <tr v-for="h in spot.history" :key="h.id">
@@ -111,8 +113,5 @@ const mapsUrl = computed(
 .maplink { display: inline-block; margin-top: 14px; font-size: .88rem; }
 blockquote { margin: 14px 0 6px; padding: 10px 14px; border-left: 4px solid var(--ghost); background: #f2f8fa; border-radius: 0 10px 10px 0; font-size: .92rem; }
 .stamp { margin: 6px 0 0; font-size: .8rem; }
-.wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: 8px; }
-th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
 @media (max-width: 720px) { .two { grid-template-columns: 1fr; } }
 </style>

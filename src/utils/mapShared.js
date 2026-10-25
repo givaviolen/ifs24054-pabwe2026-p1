@@ -1,6 +1,9 @@
+import { STATUS_META } from "../constants/status";
+
 // Konstanta dan pembuat isi popup yang dipakai bersama peta Google dan peta OpenStreetMap.
-export const COLORS = { AMAN: "#1f9d55", WASPADA: "#f2b705", BAHAYA: "#d33a3a" };
-export const LABELS = { AMAN: "Aman Berenang", WASPADA: "Waspada", BAHAYA: "Bahaya / Tutup" };
+const pickMeta = (key) => Object.fromEntries(Object.entries(STATUS_META).map(([k, v]) => [k, v[key]]));
+export const COLORS = pickMeta("mapColor");
+export const LABELS = pickMeta("label");
 export const ZONE_RADIUS_M = 400; // lingkaran "radar" di sekitar titik pantai
 
 // Isi popup dibuat dengan DOM + textContent (bukan innerHTML) agar aman dari XSS.

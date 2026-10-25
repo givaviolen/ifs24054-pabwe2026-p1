@@ -1,14 +1,10 @@
 <script setup>
 import { computed } from "vue";
+import { NAV_LINKS } from "../../constants/navigation";
 
 const props = defineProps({ current: String, user: Object });
 defineEmits(["logout"]);
 
-const links = [
-  { name: "home", href: "/beranda", label: "Beranda" },
-  { name: "list", href: "/daftar", label: "Daftar" },
-  { name: "map", href: "/peta", label: "Peta" },
-];
 // Detail pantai = bagian "Daftar"; semua halaman petugas/login = "admin".
 const active = computed(() => {
   const c = props.current || "";
@@ -23,7 +19,7 @@ const active = computed(() => {
     <a class="brand" href="/beranda">🌊 TobaWaterSafe</a>
 
     <nav class="links" aria-label="Menu utama">
-      <a v-for="l in links" :key="l.name" :href="l.href" class="item" :class="{ on: active === l.name }">
+      <a v-for="l in NAV_LINKS" :key="l.name" :href="l.href" class="item" :class="{ on: active === l.name }">
         {{ l.label }}
       </a>
     </nav>

@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { COLORS, ZONE_RADIUS_M, buildSpotInfo } from "../utils/mapShared";
+import { COLORS, ZONE_RADIUS_M, buildSpotInfo } from "../../utils/mapShared";
 
 // Peta OpenStreetMap (tanpa API key). Dipakai bila Google Maps belum diatur atau ditolak.
 const props = defineProps({ spots: { type: Array, default: () => [] } });

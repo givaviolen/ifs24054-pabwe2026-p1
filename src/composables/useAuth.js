@@ -1,5 +1,7 @@
 import { reactive } from "vue";
-import { loginRequest, registerRequest, meRequest, logoutRequest, getToken, setToken, onUnauthorized } from "../services/api";
+import { loginRequest, registerRequest, meRequest, logoutRequest } from "../services/authApi";
+import { getToken, setToken } from "../services/tokenStorage";
+import { onUnauthorized } from "../services/httpClient";
 
 // State login global (dibagi seluruh komponen).
 export const auth = reactive({ user: null, ready: false });

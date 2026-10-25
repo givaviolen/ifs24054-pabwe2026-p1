@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
-import { loadGoogleMaps, hasMapsKey, onMapsAuthFailure, isMapsAuthFailed } from "../services/googleMaps";
-import { COLORS, LABELS, ZONE_RADIUS_M, buildSpotInfo } from "../utils/mapShared";
+import { loadGoogleMaps, hasMapsKey, onMapsAuthFailure, isMapsAuthFailed } from "../../services/googleMaps";
+import { COLORS, LABELS, ZONE_RADIUS_M, buildSpotInfo } from "../../utils/mapShared";
 
 // Peta Google Maps. Bila key belum ada / ditolak / gagal dimuat, memberi tahu induk lewat "failed".
 const props = defineProps({ spots: { type: Array, default: () => [] } });

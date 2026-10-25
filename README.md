@@ -7,19 +7,35 @@ Back-End (Express + SQLite) ada di repo terpisah: `ifs24054-pabwe2026-proyek1-be
 
 - **Wisatawan** (tanpa akun): beranda, daftar pantai (cari, filter kabupaten/status/pelampung/ramah anak, urutkan), peta berwarna, detail kondisi terkini + riwayat.
 - **Petugas** (login): tambah/ubah/hapus pantai (CRUD) dan catat kondisi harian.
-- Rute: `#/beranda`, `#/daftar`, `#/peta`, `#/pantai/:id`, `#/petugas`.
+- Rute: `/beranda`, `/daftar`, `/peta`, `/pantai/:id`, `/auth/login`, `/auth/register`, `/petugas`, `/petugas/pantai`, `/petugas/pantai/tambah`, `/petugas/kondisi`.
 
 ## Struktur
 
+View hanya merakit komponen; logika ada di composable/utils; akses API ada di services.
+
 ```
 src/
-├── App.vue                  # kerangka + routing
-├── views/                   # HomeView  SpotsView  AdminView
-├── components/              # Navbar Footer SpotCard FilterBar SpotDetail AdminLogModal
-│                            # SpotForm LoginPanel MapView StatusBadge ApiAlert ...
-├── composables/             # useSpots  useAuth  useRoute
-├── services/                # api.js (axios)  googleMaps.js
-└── utils/                   # format.js  route.js  mapShared.js
+├── App.vue                  # kerangka halaman + pemilihan view
+├── main.js  style.css
+├── views/                   # HomeView SpotsView AdminView NotFoundView
+├── components/
+│   ├── layout/              # Navbar Footer
+│   ├── common/              # StatusBadge ApiAlert LakeScene
+│   ├── home/                # Hero Showcase Stats About Education (section Beranda)
+│   ├── spots/               # SpotCard SpotDetail SpotForm FilterBar
+│   ├── map/                 # MapView GoogleMapPane LeafletMapPane
+│   ├── admin/               # AdminSummary AdminSpotTable AdminLogTable AdminLogModal
+│   └── auth/                # LoginPanel
+├── composables/             # state & alur: useSpots useAuth useRoute useRouteGuard
+│                            # useSpotActions useLogDialog useNotice
+├── services/                # httpClient (axios) spotApi authApi apiError tokenStorage googleMaps
+├── utils/                   # fungsi murni: route date status spotSort spotSearch
+│                            # spotFilters spotStats spotForm apiUrl mapShared
+├── constants/               # status (label/ikon/warna), navigation
+├── config/env.js            # pembacaan variabel lingkungan Vite
+├── data/                    # konten statis (edukasi, foto pantai)
+└── styles/home.css          # gaya bersama section Beranda
+tests/                       # bun test untuk fungsi murni
 ```
 
 ## Menjalankan lokal
@@ -31,6 +47,7 @@ bun install
 cp .env.example .env      # Windows PowerShell: copy .env.example .env
 bun run dev               # http://localhost:5173
 bun run build             # hasil di dist/
+bun test                  # tes unit fungsi murni
 ```
 
 ## Menghubungkan ke Back-End

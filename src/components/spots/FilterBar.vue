@@ -1,4 +1,6 @@
 <script setup>
+import { STATUS_META } from "../../constants/status";
+
 const props = defineProps({ modelValue: Object, kabupatenList: Array, sort: String });
 const emit = defineEmits(["update:modelValue", "update:sort"]);
 const set = (key, value) => emit("update:modelValue", { ...props.modelValue, [key]: value });
@@ -19,9 +21,7 @@ const set = (key, value) => emit("update:modelValue", { ...props.modelValue, [ke
     <label>Status kelayakan
       <select :value="modelValue.status" @change="set('status', $event.target.value)">
         <option value="">Semua</option>
-        <option value="AMAN">🟢 Aman Berenang</option>
-        <option value="WASPADA">🟡 Waspada</option>
-        <option value="BAHAYA">🔴 Bahaya / Tutup</option>
+        <option v-for="(meta, key) in STATUS_META" :key="key" :value="key">{{ meta.icon }} {{ meta.label }}</option>
       </select>
     </label>
     <label v-if="sort !== undefined">Urutkan

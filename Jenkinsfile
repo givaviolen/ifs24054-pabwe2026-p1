@@ -24,6 +24,10 @@ pipeline {
       steps { sh 'bun install' }
     }
 
+    stage('Test') {
+      steps { sh 'bun test' }
+    }
+
     stage('Build') {
       steps { sh 'bun run build' }
     }
